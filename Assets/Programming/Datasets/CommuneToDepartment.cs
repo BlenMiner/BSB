@@ -24,6 +24,7 @@ public class CommuneToDepartment : Dataset
     {
         public byte ninsee;
         public int code_postal;
+        public string departement;
     }
 
     List<ValeurContenuDansBytes_Idf_2017> readBinFile_Idf_2017(string readPath)
@@ -47,6 +48,7 @@ public class CommuneToDepartment : Dataset
 
             lignes_dep.ninsee = ligne.ninsee;
             lignes_dep.code_postal = ligne.code_postal;
+            lignes_dep.departement = lignes_dep.code_postal.ToString().Substring(0, 2);
 
             ligneContenuDansBytes.Add(ligne);
             ligneCommuneDep.Add(lignes_dep);
