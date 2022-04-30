@@ -46,7 +46,7 @@ public class WeatherDataset : Dataset
     WeatherState minWeather, maxWeather;
 
     float m_timemachineLength = 0;
-
+    
     private void Awake()
     {
         minWeather = new WeatherState{
@@ -301,11 +301,11 @@ public class WeatherDataset : Dataset
         return m_properties;
     }
 
-    public override bool GetData(string departmentId, string property, float time, out float value)
+    public override bool GetData(int postalCode, string property, float time, out float value)
     {
         value = 0f;
 
-        if (!GetWeather(departmentId, time, out var weather)) return false;
+        if (!GetWeather(GetDepartmentID(postalCode), time, out var weather)) return false;
 
         switch (property)
         {

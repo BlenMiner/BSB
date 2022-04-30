@@ -2,78 +2,132 @@ using RewindSystem;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using UnityEngine;
 
-public struct ValeurContenuDansBytes_Idf_2017
+[System.Serializable]
+public struct PolutionData
 {
     public DateTime date;
-    public byte ninsee;
+
+    public int ninsee;
+
     public byte no2;
+
     public byte o3;
+
     public byte pm10;
-    public string commune;
+
     public int code_postal;
+
+    public string name;
+
+    public int unk;
+
+    public string departement;
+
     public float latitude;
+
     public float longitude;
 }
 
 
 public class BSB_Dataset : Dataset
 {
-    string inCaseOfEmptyString(string a)
-    {
-        if (string.IsNullOrEmpty(a))
-        {
-            return "0";
-        }
-        return a;
-    }
+    Dictionary<int, Rewind<PolutionData>> m_data = 
+        new Dictionary<int, Rewind<PolutionData>>();
 
-    Dictionary<string, Rewind<ValeurContenuDansBytes_Idf_2017>> m_timemachine = new Dictionary<string, Rewind<ValeurContenuDansBytes_Idf_2017>>();
-    List<ValeurContenuDansBytes_Idf_2017> readBinFile_Idf_2017(string readPath)
-    {
-        BinaryReader br = new BinaryReader(new FileStream(readPath, FileMode.Open));
-        List<ValeurContenuDansBytes_Idf_2017> ligneContenuDansBytes = new List<ValeurContenuDansBytes_Idf_2017>();
-        while (br.BaseStream.Position < br.BaseStream.Length)
-        {
-            ValeurContenuDansBytes_Idf_2017 ligne = new ValeurContenuDansBytes_Idf_2017();
-            ligne.date = DateTime.Parse(br.ReadString());
-            ligne.ninsee = br.ReadByte();
-            ligne.no2 = br.ReadByte();
-            ligne.o3 = br.ReadByte();
-            ligne.pm10 = br.ReadByte();
-            ligne.code_postal = br.ReadInt32();
-            ligne.latitude = br.ReadSingle();
-            ligne.longitude = br.ReadSingle();
+    [SerializeField, Provides] BSB_Dataset m_provider;
 
-            ligneContenuDansBytes.Add(ligne);
+    [SerializeField] TextAsset m_dataset;
 
-            if (!m_timemachine.ContainsKey(ligne.commune))
-            {
-                m_timemachine.Add(ligne.commune, new Rewind<ValeurContenuDansBytes_Idf_2017>());
-            }        }
-        br.Close();
-        return ligneContenuDansBytes;
-    }
+    [Inject] INSEEDataset m_inseeDataset;
 
-    float m_timemachineLength = 0;
-    List<ValeurContenuDansBytes_Idf_2017> valeursContenusDansDataset = new List<ValeurContenuDansBytes_Idf_2017>();
+    [Inject] TimeMachine m_timeMachine;
+
+    public HashSet<int> INSEECodes {get; private set;} = new HashSet<int>();
+
+    int minNO2 = int.MaxValue, minO3 = int.MaxValue, minPM10 = int.MaxValue;
+
+    int maxNO2 = int.MinValue, maxO3 = int.MinValue, maxPM10 = int.MinValue;
 
     private void Awake()
     {
-        valeursContenusDansDataset = readBinFile_Idf_2017("BSB_Dataset.bytes");
+        ImportData();
     }
 
-    readonly DatasetProp[] m_properties = new DatasetProp[] {
-        new DatasetProp {Value = "ninsee" },
-        new DatasetProp {Value = "no2" },
-        new DatasetProp {Value = "o3" },
-        new DatasetProp {Value = "pm10" },
-        new DatasetProp {Value = "commune" },
-        new DatasetProp {Value = "code postal" },
-        new DatasetProp {Value = "latitude" },
-        new DatasetProp {Value = "longitude" },
+    void ImportData()
+    {
+        // Creates and initializes a CultureInfo.
+        CultureInfo myCI = new CultureInfo("fr-FR", false);
+        CultureInfo.CurrentCulture = myCI;
+
+        using BinaryReader br = new BinaryReader(new MemoryStream(m_dataset.bytes));
+        int added = 0;
+
+        while (br.BaseStream.Position < br.BaseStream.Length)
+        {
+            var dateStr = br.ReadString();
+
+            if (!DateTime.TryParse(dateStr, out var date))
+                Debug.LogError("Failed to parse: " + dateStr);
+
+            PolutionData ligne = new PolutionData
+            {
+                date = date,
+                ninsee = br.ReadInt32(),
+                no2 = br.ReadByte(),
+                o3 = br.ReadByte(),
+                pm10 = br.ReadByte(),
+                name = br.ReadString(),
+                code_postal = br.ReadInt32(),
+                latitude = br.ReadSingle(),
+                longitude = br.ReadSingle()
+            };
+
+            INSEECodes.Add(ligne.ninsee);
+
+            minNO2 = Mathf.Min(minNO2, ligne.no2);
+            minO3 = Mathf.Min(minO3, ligne.o3);
+            minPM10 = Mathf.Min(minPM10, ligne.pm10);
+
+            maxNO2 = Mathf.Max(maxNO2, ligne.no2);
+            maxO3 = Mathf.Max(maxO3, ligne.o3);
+            maxPM10 = Mathf.Max(maxPM10, ligne.pm10);
+            
+            if (ligne.code_postal == 0)
+            {
+                if (m_inseeDataset.GetINSEE(ligne.ninsee, out var data))
+                {
+                    ligne.departement = data.DepId;
+                    ligne.code_postal = data.PostalCode;
+                    ligne.longitude = (float)data.LonLat.x;
+                    ligne.latitude = (float)data.LonLat.y;
+                }
+                else continue;
+            }
+            else ligne.departement = ligne.code_postal.ToString().Substring(0, 2);
+
+            if (!m_data.ContainsKey(ligne.ninsee))
+                m_data.Add(ligne.ninsee, new Rewind<PolutionData>());
+            
+            var time = m_data[ligne.ninsee];
+            float actualDate = (float)(date - WeatherDataset.START_DATE).TotalDays;
+
+            float percentage = actualDate / (m_timeMachine.LengthDate * 0.01f);
+
+            time.RegisterFrame(ligne, percentage);
+
+            ++added;
+        }
+    }
+
+    readonly DatasetProp[] m_properties = new DatasetProp[]
+    {
+        new DatasetProp {Value = "NO2" },
+        new DatasetProp {Value = "O3" },
+        new DatasetProp {Value = "PM10" },
     };
 
     public override DatasetProp[] GetDataProperties()
@@ -81,28 +135,26 @@ public class BSB_Dataset : Dataset
         return m_properties;
     }
 
-    public bool GetPollution(string commune, float timep100, out ValeurContenuDansBytes_Idf_2017 value)
+    public bool GetPollution(int codePostal, float timep100, out PolutionData value)
     {
         value = default;
-        if (!m_timemachine.ContainsKey(commune)) return false;
-        value = m_timemachine[commune].GetFrame(timep100);
+        if (!m_data.ContainsKey(codePostal)) return false;
+        value = m_data[codePostal].GetFrame(timep100);
         return true;
     }
-    public override bool GetData(string ninsee, string property, float time, out float value)
+
+    public override bool GetData(int codePostal, string property, float time, out float value)
     {
         value = 0f;
 
-        if (!GetPollution(ninsee, time, out var valeurContenuDansBytes_Idf_2017)) return false;
+        if (!GetPollution(codePostal, time, out var polutionData))
+            return false;
 
         switch (property)
         {
-            case "ninsee": value = valeurContenuDansBytes_Idf_2017.ninsee; return true;
-            case "no2": value = valeurContenuDansBytes_Idf_2017.no2; return true;
-            case "o3": value = valeurContenuDansBytes_Idf_2017.o3; return true;
-            case "pm10": value = valeurContenuDansBytes_Idf_2017.pm10; return true;
-            case "commune": value = float.Parse(valeurContenuDansBytes_Idf_2017.commune); return true;
-            case "latitude": value = valeurContenuDansBytes_Idf_2017.latitude; return true;
-            case "longitude": value = valeurContenuDansBytes_Idf_2017.longitude; return true;
+            case "NO2": value = polutionData.no2; return true;
+            case "O3": value = polutionData.o3; return true;
+            case "PM10": value = polutionData.pm10; return true;
         }
 
         return false;
@@ -110,11 +162,25 @@ public class BSB_Dataset : Dataset
 
     public override float GetMaxPossibleValue(string property) //une des valeurs de datasetProp[]
     {
-        throw new System.NotImplementedException();
+        switch (property)
+        {
+            case "NO2": return maxNO2;
+            case "O3": return maxO3;
+            case "PM10": return maxPM10;
+        }
+
+        return 0f;
     }
 
     public override float GetMinPossibleValue(string property)
     {
-        throw new System.NotImplementedException();
+        switch (property)
+        {
+            case "NO2": return minNO2;
+            case "O3": return minO3;
+            case "PM10": return minPM10;
+        }
+
+        return 0f;
     } 
 }

@@ -8,9 +8,13 @@ public class MapCanvasLayers : MonoBehaviour
 {
     [Inject] DepartmentDataset m_depDataset;
 
+    [Inject] INSEEDataset m_inseeDataset;
+
     [Inject] AbstractMap m_map;
 
     [Inject] Camera m_camera;
+
+    [Inject] BSB_Dataset m_polution;
 
     [SerializeField] GameObject m_knobMarker;
 
@@ -92,8 +96,15 @@ public class MapCanvasLayers : MonoBehaviour
             }
         }
 
+        foreach(var m in m_polution.INSEECodes)
+        {
+            if (m_inseeDataset.GetINSEE(m, out var v))
+                SpawnMarker(prefab, v.LonLat, v.ID);
+        }
+
         m_depDataset.MapDepCoords((depId, coord) => {
-            SpawnMarker(prefab, coord, depId);
+            if (m_inseeDataset.GetINSEE(depId, out var v) && !m_polution.INSEECodes.Contains(v.ID))
+                SpawnMarker(prefab, coord, v.ID);
         });
     }
 
@@ -109,14 +120,14 @@ public class MapCanvasLayers : MonoBehaviour
         }
     }
 
-    public MapMarker SpawnMarker(GameObject prefab, Vector2d longLat, string departmentId)
+    public MapMarker SpawnMarker(GameObject prefab, Vector2d longLat, int postalCode)
     {
         var go = Instantiate(prefab);
         go.transform.SetParent(transform, false);
 
         MapMarker marker = go.GetComponent<MapMarker>();
 
-        marker.Setup(m_layer == null ? -1 : m_layerId, this, m_layerData, longLat, departmentId);
+        marker.Setup(m_layer == null ? -1 : m_layerId, this, m_layerData, longLat, postalCode);
         m_markers.Add(marker);
         return marker;
     }

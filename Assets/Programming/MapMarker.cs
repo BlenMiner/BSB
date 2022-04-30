@@ -13,7 +13,7 @@ public class MapMarker : MonoBehaviour
 
     Vector2d m_pos;
 
-    string m_depId;
+    int m_postalCode;
 
     public Vector2d LongLat => m_pos;
 
@@ -23,16 +23,16 @@ public class MapMarker : MonoBehaviour
 
     int m_layerId = -1;
 
-    public void Setup(int layerId, MapCanvasLayers parent, MapLayer layer, Vector2d longLat, string departmentId)
+    public void Setup(int layerId, MapCanvasLayers parent, MapLayer layer, Vector2d longLat, int postalCode)
     {
         m_layerId = layerId;
 
-        if (layerId > 0) MapboxPolygonDrawer.GetMaterialProperties(layerId, departmentId, out m_material);
+        if (layerId > 0) MapboxPolygonDrawer.GetMaterialProperties(layerId, Dataset.GetDepartmentID(postalCode), out m_material);
 
         m_parent = parent;
         m_layerData = layer;
         m_pos = longLat;
-        m_depId = departmentId;
+        m_postalCode = postalCode;
 
         TimeUpdated(m_timeMachine.CurrentPercentage);
 
@@ -50,7 +50,7 @@ public class MapMarker : MonoBehaviour
 
     public void TimeUpdated(float time)
     {
-        if (m_layerData.Formula.Compute(m_depId, time, out var value))
+        if (m_layerData.Formula.Compute(m_postalCode, time, out var value))
         {
             var minv = m_parent.MinVal;
             var maxv = m_parent.MaxVal;
@@ -66,7 +66,7 @@ public class MapMarker : MonoBehaviour
             }
             else m_shape.color = color;
 
-            if (m_layerData.SizeFormula.Compute(m_depId, time, out var scale))
+            if (m_layerData.SizeFormula.Compute(m_postalCode, time, out var scale))
                 m_shape.transform.localScale = Vector3.one * scale;
 
             if (m_layerData.Type == MapType.Text)
@@ -90,7 +90,7 @@ public class MapMarker : MonoBehaviour
         }
 
         if (m_material != null)
-            MapboxPolygonDrawer.SendUpdate(m_layerId, m_depId);
+            MapboxPolygonDrawer.SendUpdate(m_layerId, Dataset.GetDepartmentID(m_postalCode));
     }
 
     private void OnDisable()

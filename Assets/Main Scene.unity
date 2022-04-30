@@ -877,6 +877,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 588073054}
+  - component: {fileID: 588073059}
   - component: {fileID: 588073053}
   - component: {fileID: 588073055}
   - component: {fileID: 588073056}
@@ -972,11 +973,26 @@ MonoBehaviour:
   m_GameObject: {fileID: 588073052}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 403eede77bf66d74090b0d93d8942d57, type: 3}
+  m_Script: {fileID: 11500000, guid: 0614e4d165594a241b98421119ab71bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  me: {fileID: 588073058}
-  m_data: {fileID: 4900000, guid: 686f09cf1f6881341a25e8b301ab99f2, type: 3}
+  m_datasetName: Polution
+  m_provider: {fileID: 588073058}
+  m_dataset: {fileID: 4900000, guid: 29cf21880dab943488546c537b6aa0fe, type: 3}
+--- !u!114 &588073059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 588073052}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf6eb9ca378666148908f0620cc1ee51, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_provider: {fileID: 588073059}
+  m_dataset: {fileID: 4900000, guid: 33fb485da3cf65b45a413e14020c2721, type: 3}
 --- !u!1 &642931542
 GameObject:
   m_ObjectHideFlags: 0
@@ -2552,10 +2568,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c627ae48fcaf6db4f8c6d50ccaec0595, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_camera: {fileID: 1787361574}
-  m_map: {fileID: 555018383}
-  m_markerPrefab: {fileID: 6879229632684554644, guid: 80b119d7886029c46b493704d2fc059c,
-    type: 3}
 --- !u!1 &1160893074
 GameObject:
   m_ObjectHideFlags: 0

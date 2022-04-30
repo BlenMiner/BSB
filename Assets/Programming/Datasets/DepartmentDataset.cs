@@ -113,7 +113,7 @@ public class DepartmentDataset : Dataset
         return m_properties;
     }
 
-    public override bool GetData(string departmentId, string property, float time, out float value)
+    public override bool GetData(int insee, string property, float time, out float value)
     {
         value = 0f;
 
@@ -121,7 +121,7 @@ public class DepartmentDataset : Dataset
         {
             case "DepPopulation":
             {
-                if (m_depPopCount.TryGetValue(departmentId, out var v))
+                if (m_depPopCount.TryGetValue(GetDepartmentID(insee), out var v))
                 {
                     value = v;
                     return true;

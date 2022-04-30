@@ -390,13 +390,15 @@ public class CrimeDataset : Dataset
         return m_props;
     }
 
-    public override bool GetData(string departmentId, string property, float time, out float value)
+    public override bool GetData(int postalCode, string property, float time, out float value)
     {
         value = default;
 
         if (!int.TryParse(property.Substring(1), out var crimeId)) return false;
 
+        string departmentId = GetDepartmentID(postalCode);
         bool valid;
+
         CrimeState crime;
         
         if (crimeId > 0)
