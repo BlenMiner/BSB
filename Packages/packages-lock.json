@@ -1,12 +1,5 @@
 {
   "dependencies": {
-    "com.monitor1394.xcharts": {
-      "version": "https://github.com/monitor1394/unity-ugui-XCharts.git#2.0-upm",
-      "depth": 0,
-      "source": "git",
-      "dependencies": {},
-      "hash": "974381c9742af809c6d65e295df01b97775918b1"
-    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,
