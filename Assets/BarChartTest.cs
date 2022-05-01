@@ -8,7 +8,7 @@ public class BarChartTest : MonoBehaviour
 {
     string ville = "Paris";
     string date = "17/01/2017";
-    float[] data_paris = { 23.5f, 16, 43.4f, 22 };
+    float[] data_paris = { 23.5f, 16, 43.4f};
     // Start is called before the first frame update
     void Start()
     {
@@ -26,11 +26,9 @@ public class BarChartTest : MonoBehaviour
         chart.AddXAxisData("no2");
         chart.AddXAxisData("o3");
         chart.AddXAxisData("pm10");
-        chart.AddXAxisData("weather");
         chart.AddData("line", data_paris[0]);
         chart.AddData("line", data_paris[1]);
         chart.AddData("line", data_paris[2]);
-        chart.AddData("line", data_paris[3]);
     }
 
     // Update is called once per frame
