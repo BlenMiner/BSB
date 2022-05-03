@@ -79,13 +79,20 @@ namespace Mapbox.Unity.MeshGeneration.Modifiers
 			}
 			ve.MeshRenderer.materials = mats;
 
-			if (ve.Feature != null && ve.Feature.Properties.ContainsKey("code_insee") &&
-				MapboxPolygonDrawer.GetMaterialProperties(_options.SOME_ID, (string)ve.Feature.Properties["code_insee"], out var popBlock)
+			if (ve.Feature != null && ve.Feature.Properties.ContainsKey("code") &&
+				MapboxPolygonDrawer.GetMaterialProperties(_options.SOME_ID, int.Parse((string)ve.Feature.Properties["code"]), out var popBlock)
 			)
 			{
 				MapboxPolygonDrawer.RemoveMaterialPropertiesListener(ve.MeshRenderer);
-				MapboxPolygonDrawer.SetMaterialPropertiesListener(_options.SOME_ID, (string)ve.Feature.Properties["code_insee"], ve.MeshRenderer);
+				MapboxPolygonDrawer.SetMaterialPropertiesListener(_options.SOME_ID, int.Parse((string)ve.Feature.Properties["code"]), ve.MeshRenderer);
 				ve.MeshRenderer.SetPropertyBlock(popBlock);
+
+				if (!ve.MeshRenderer.enabled)
+					ve.MeshRenderer.enabled = true;
+			}
+			else if (ve.MeshRenderer.enabled)
+            {
+				ve.MeshRenderer.enabled = false;
 			}
 		}
 

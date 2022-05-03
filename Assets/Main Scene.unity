@@ -735,8 +735,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _options:
     locationOptions:
-      latitudeLongitude: 46.8807370611911, 3.03996647427249
-      zoom: 6
+      latitudeLongitude: 48.6382191129608, 2.49121014570281
+      zoom: 8.6
     extentOptions:
       extentType: 0
       defaultExtents:
@@ -813,7 +813,7 @@ MonoBehaviour:
         isActive: 1
         layerSource:
           Name: Mapbox Streets
-          Id: blenminer.7yzktbf6
+          Id: blenminer.25ofmm0h
           Modified: 
           UserName: 
       useOptimizedStyle: 0

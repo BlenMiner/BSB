@@ -10,11 +10,11 @@ public class MapCanvasLayers : MonoBehaviour
 
     [Inject] INSEEDataset m_inseeDataset;
 
+    [Inject] BSB_Dataset m_polution;
+
     [Inject] AbstractMap m_map;
 
     [Inject] Camera m_camera;
-
-    [Inject] BSB_Dataset m_polution;
 
     [SerializeField] GameObject m_knobMarker;
 
@@ -80,7 +80,7 @@ public class MapCanvasLayers : MonoBehaviour
 
     private void Start()
     {
-        GameObject prefab = null;
+        GameObject prefab;
 
         switch (m_layerData.Type)
         {
@@ -96,16 +96,21 @@ public class MapCanvasLayers : MonoBehaviour
             }
         }
 
-        foreach(var m in m_polution.INSEECodes)
+        /*m_inseeDataset.MapDepCoords((insee, LonLat) =>
+        {
+            SpawnMarker(prefab, LonLat, insee);
+        });*/
+
+        foreach (var m in m_polution.INSEECodes)
         {
             if (m_inseeDataset.GetINSEE(m, out var v))
                 SpawnMarker(prefab, v.LonLat, v.ID);
         }
 
-        m_depDataset.MapDepCoords((depId, coord) => {
+        /*m_depDataset.MapDepCoords((depId, coord) => {
             if (m_inseeDataset.GetINSEE(depId, out var v) && !m_polution.INSEECodes.Contains(v.ID))
                 SpawnMarker(prefab, coord, v.ID);
-        });
+        });*/
     }
 
     public void SetDirty()

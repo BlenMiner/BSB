@@ -190,7 +190,7 @@ public class Formula
         return (float)m_parser.Eval();
     }
 
-    float ComputeExpr(int postalCode, float time)
+    float ComputeExpr(int insee, float time)
     {
         var expr = m_parsedFormula;
 
@@ -201,7 +201,7 @@ public class Formula
         {
             var variable = m_variables[i];
 
-            if (variable.Source.GetData(postalCode, variable.Attribute, time, out var v))
+            if (variable.Source.GetData(insee, variable.Attribute, time, out var v))
             {
                 string varName = ((char)('a' + i)).ToString();
                 float varValue = v;
@@ -214,13 +214,13 @@ public class Formula
         return (float)m_parser.Eval();
     }
 
-    public bool Compute(int postalCode, float time, out float value)
+    public bool Compute(int insee, float time, out float value)
     {
         value = 0f;
 
         try
         {
-            value = ComputeExpr(postalCode, time);
+            value = ComputeExpr(insee, time);
             return true;
         }
         catch

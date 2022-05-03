@@ -11,6 +11,10 @@ public class MapboxPolygonDrawer : MonoBehaviour
 
     [Inject] DepartmentDataset m_departmentDataset;
 
+    [Inject] INSEEDataset m_inseeDataset;
+
+    [Inject] BSB_Dataset m_polution;
+
     static MapboxPolygonDrawer m_ref;
 
     [Inject] AbstractMap m_map;
@@ -24,43 +28,42 @@ public class MapboxPolygonDrawer : MonoBehaviour
 
     static int m_ID = 1;
 
-    static Dictionary<int, Dictionary<string, MaterialPropertyBlock>> m_attributes 
-        = new Dictionary<int, Dictionary<string, MaterialPropertyBlock>>();
+    static Dictionary<int, Dictionary<int, MaterialPropertyBlock>> m_attributes 
+        = new Dictionary<int, Dictionary<int, MaterialPropertyBlock>>();
     
-        static Dictionary<int, Dictionary<string, HashSet<MeshRenderer>>> m_attributesListeners 
-        = new Dictionary<int, Dictionary<string, HashSet<MeshRenderer>>>();
+        static Dictionary<int, Dictionary<int, HashSet<MeshRenderer>>> m_attributesListeners 
+        = new Dictionary<int, Dictionary<int, HashSet<MeshRenderer>>>();
 
-    public static bool GetMaterialProperties(int id, string department, out MaterialPropertyBlock value)
+    public static bool GetMaterialProperties(int id, int insee, out MaterialPropertyBlock value)
     {
-        department = department.Length == 1 ? "0" + department : department;
-
         value = null;
 
-        return m_attributes.TryGetValue(id, out var local) && local.TryGetValue(department, out value);
+        return m_attributes.TryGetValue(id, out var local) && local.TryGetValue(insee, out value);
     }
 
-    public static void SetMaterialPropertiesListener(int id, string department, MeshRenderer renderer)
+    public static void SetMaterialPropertiesListener(int id, int insee, MeshRenderer renderer)
     {
-        department = department.Length == 1 ? "0" + department : department;
-
-        if (!m_attributesListeners.ContainsKey(id)) m_attributesListeners.Add(id, new Dictionary<string, HashSet<MeshRenderer>>());
+        if (!m_attributesListeners.ContainsKey(id)) m_attributesListeners.Add(id, new Dictionary<int, HashSet<MeshRenderer>>());
 
         var local = m_attributesListeners[id];
 
-        if (!local.ContainsKey(department)) local.Add(department, new HashSet<MeshRenderer>());
+        if (!local.ContainsKey(insee)) local.Add(insee, new HashSet<MeshRenderer>());
 
-        local[department].Add(renderer);
+        local[insee].Add(renderer);
     }
 
-    public static void SendUpdate(int id, string department)
+    public static void SendUpdate(int id, int insee)
     {
         if (m_attributesListeners.TryGetValue(id, out var local) && 
-            local.TryGetValue(department, out var value) && 
-            GetMaterialProperties(id, department, out var props))
+            local.TryGetValue(insee, out var value) && 
+            GetMaterialProperties(id, insee, out var props))
         {
             foreach(var v in value)
             {
-                if (v != null) v.SetPropertyBlock(props);
+                if (v != null)
+                {
+                    v.SetPropertyBlock(props);
+                }
             }
         }
     }
@@ -89,28 +92,33 @@ public class MapboxPolygonDrawer : MonoBehaviour
         geoMaterials.customStyleOptions.materials[1].Materials[0] = m_ref.m_mat;
         geoMaterials.HasChanged = true;
 
-        if (!m_attributes.ContainsKey(geoMaterials.SOME_ID)) m_attributes.Add(geoMaterials.SOME_ID, new Dictionary<string, MaterialPropertyBlock>());
+        if (!m_attributes.ContainsKey(geoMaterials.SOME_ID)) m_attributes.Add(geoMaterials.SOME_ID, new Dictionary<int, MaterialPropertyBlock>());
 
         var localAtrb = m_attributes[geoMaterials.SOME_ID];
 
         propsId = geoMaterials.SOME_ID;
 
-        m_ref.m_departmentDataset.MapDepCoords((depId, _) => {
-            var props = new MaterialPropertyBlock();
-            props.SetColor("_Color", default);
+        foreach (var m in m_ref.m_polution.INSEECodes)
+        {
+            if (m_ref.m_inseeDataset.GetINSEE(m, out var v))
+            {
+                var props = new MaterialPropertyBlock();
+                props.SetColor("_Color", default);
 
-            var department = depId.Length == 1 ? "0" + depId : depId;
-            if (!localAtrb.ContainsKey(department))
-                localAtrb.Add(department, props);
-            else localAtrb[department] = props;
-        });
+                var insee = v.ID;
+
+                if (!localAtrb.ContainsKey(insee))
+                    localAtrb.Add(insee, props);
+                else localAtrb[insee] = props;
+            }
+        }
 
         var layer = new VectorSubLayerProperties()
         {
             coreOptions = new CoreVectorLayerProperties() {
                 geometryType = VectorPrimitiveType.Polygon,
                 isActive = true,
-                layerName = "departements-20140306-100m_2-7t6d66",
+                layerName = "communes-ile-de-france-8l28yb",
                 snapToTerrain = true,
                 combineMeshes = false,
                 sublayerName = "SUB_POLYGON_FEATURE"
