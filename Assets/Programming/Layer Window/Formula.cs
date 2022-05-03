@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using org.mariuszgromada.math.mxparser;
+using muParserNET;
 using UnityEngine;
 
 public class Formula
@@ -12,7 +12,7 @@ public class Formula
 
     public string Error {get; private set;} = string.Empty;
 
-    Expression m_parser = new Expression();
+    Parser m_parser = new Parser();
 
     List<DatasetReference> m_variables;
 
@@ -157,61 +157,61 @@ public class Formula
     float ComputeExprMin()
     {
         var expr = m_parsedFormula;
-        
-        if (m_parser.getExpressionString() != expr)
-            m_parser.setExpressionString(expr);
+
+        if (m_parser.Expr != expr)
+            m_parser.Expr = expr;
 
         for(int i = 0; i < m_variables.Count; ++i)
         {
             var variable = m_variables[i];
-            m_parser.addConstants(new Constant(
-                ((char)('a' + i)).ToString(),
-                variable.Source.GetMinPossibleValue(variable.Attribute))
-            );
+            string varName = ((char)('a' + i)).ToString();
+            float varValue = variable.Source.GetMinPossibleValue(variable.Attribute);
+            m_parser.DefineVar(varName, varValue);
         }
 
-        return (float)m_parser.calculate();
+        return (float)m_parser.Eval();
     }
 
     float ComputeExprMax()
     {
         var expr = m_parsedFormula;
-        if (m_parser.getExpressionString() != expr)
-            m_parser.setExpressionString(expr);
 
-        for(int i = 0; i < m_variables.Count; ++i)
+        if (m_parser.Expr != expr)
+            m_parser.Expr = expr;
+
+        for (int i = 0; i < m_variables.Count; ++i)
         {
             var variable = m_variables[i];
-            m_parser.addConstants(new Constant(
-                ((char)('a' + i)).ToString(),
-                variable.Source.GetMaxPossibleValue(variable.Attribute))
-            );
+            string varName = ((char)('a' + i)).ToString();
+            float varValue = variable.Source.GetMaxPossibleValue(variable.Attribute);
+            m_parser.DefineVar(varName, varValue);
         }
 
-        return (float)m_parser.calculate();
+        return (float)m_parser.Eval();
     }
 
     float ComputeExpr(int postalCode, float time)
     {
         var expr = m_parsedFormula;
-        if (m_parser.getExpressionString() != expr)
-            m_parser.setExpressionString(expr);
 
-        for(int i = 0; i < m_variables.Count; ++i)
+        if (m_parser.Expr != expr)
+            m_parser.Expr = expr;
+
+        for (int i = 0; i < m_variables.Count; ++i)
         {
             var variable = m_variables[i];
 
             if (variable.Source.GetData(postalCode, variable.Attribute, time, out var v))
             {
-                m_parser.addConstants(new Constant(
-                    ((char)('a' + i)).ToString(),
-                    v)
-                );
+                string varName = ((char)('a' + i)).ToString();
+                float varValue = v;
+
+                m_parser.DefineVar(varName, varValue);
             }
             else throw new Exception("Missing value.");
         }
 
-        return (float)m_parser.calculate();
+        return (float)m_parser.Eval();
     }
 
     public bool Compute(int postalCode, float time, out float value)
