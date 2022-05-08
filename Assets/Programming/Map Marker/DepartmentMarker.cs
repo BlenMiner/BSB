@@ -36,7 +36,7 @@ public class DepartmentMarker : MonoBehaviour
 
     private void Start()
     {
-        TimeUpdated(m_timeMachine.CurrentPercentage);
+        TimeUpdated(m_timeMachine.CurrentPercentage, m_timeMachine.SnapshotPercentage);
     }
 
     private void OnEnable()
@@ -44,7 +44,7 @@ public class DepartmentMarker : MonoBehaviour
         m_timeMachine.OnTimeMachineUpdate += TimeUpdated;
     }
 
-    private void TimeUpdated(float percentage100)
+    private void TimeUpdated(float percentage100, float snapshot)
     {
         if (m_crime.GetTotalCrime(m_depId, percentage100, out var crime))
         {

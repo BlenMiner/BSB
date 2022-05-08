@@ -16,6 +16,8 @@ public class TimeMachine : MonoBehaviour, IDragHandler, IPointerDownHandler, IPo
 
     [SerializeField] RectTransform m_knob;
 
+    [SerializeField] RectTransform m_knobB;
+
     [SerializeField] TMP_Text m_startTxt;
 
     [SerializeField] TMP_Text m_currTxt;
@@ -24,9 +26,11 @@ public class TimeMachine : MonoBehaviour, IDragHandler, IPointerDownHandler, IPo
 
     [SerializeField] TMP_Dropdown m_filter;
 
-    public event Action<float> OnTimeMachineUpdate;
+    public event Action<float, float> OnTimeMachineUpdate;
 
     public float CurrentPercentage {get; private set;}
+
+    public float SnapshotPercentage {get; private set; }
 
     private int m_startDate;
 
@@ -44,17 +48,44 @@ public class TimeMachine : MonoBehaviour, IDragHandler, IPointerDownHandler, IPo
     {
         m_currTxt.SetText(string.Empty);
 
+        SetSnapshot(0f);
         SetTime(0f);
+    }
+
+    private void OnGUI()
+    {
+        float increment = 100f / (m_subSpan.y - m_subSpan.x);
+        var e = Event.current;
+
+        if (e.type == EventType.KeyDown && e.keyCode == KeyCode.LeftArrow)
+            SetTime(CurrentPercentage - increment);
+        else if (e.type == EventType.KeyDown && e.keyCode == KeyCode.RightArrow)
+            SetTime(CurrentPercentage + increment);
     }
 
     float GetPercentage(PointerEventData data) => 
         (data.position.x - 100f) / (m_parent.rect.width * 0.01f);
 
-    public void OnDrag(PointerEventData eventData) => SetTime(GetPercentage(eventData));
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+            SetSnapshot(GetPercentage(eventData));
+        else SetTime(GetPercentage(eventData));
+    }
 
-    public void OnPointerDown(PointerEventData eventData) => SetTime(GetPercentage(eventData));
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+            SetSnapshot(GetPercentage(eventData));
+        else SetTime(GetPercentage(eventData));
+    }
 
-    public void OnPointerUp(PointerEventData eventData) => SetTime(GetPercentage(eventData));
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
+            SetSnapshot(GetPercentage(eventData));
+        else SetTime(GetPercentage(eventData));
+    }
 
     public void UpdateRange(int start, int end)
     {
@@ -106,6 +137,19 @@ public class TimeMachine : MonoBehaviour, IDragHandler, IPointerDownHandler, IPo
 
         SetTime(0f);
     }
+
+    public void SetSnapshot(float percentage)
+    {
+        percentage = Mathf.Max(0f, Mathf.Min(percentage, 100f));
+        if (Mathf.Abs(percentage - CurrentPercentage) < 2f) percentage = CurrentPercentage;
+
+        SnapshotPercentage = percentage;
+
+        float width = m_parent.rect.width * 0.01f;
+        m_knobB.anchoredPosition = new Vector2(percentage * width, 0);
+
+        SetTime(CurrentPercentage);
+    }
     
     public void SetTime(float percentage)
     {
@@ -117,6 +161,7 @@ public class TimeMachine : MonoBehaviour, IDragHandler, IPointerDownHandler, IPo
         int len = m_subSpan.y - m_subSpan.x;
 
         int date = m_subSpan.x + (int)(percentage * len / 100f);
+        int dateB = m_subSpan.x + (int)(SnapshotPercentage * len / 100f);
         var dateTime = WeatherDataset.START_DATE.AddDays(date);
 
         m_currTxt.SetText($"{dateTime.Day:00}/{dateTime.Month:00}/{dateTime.Year:0000}");
@@ -127,7 +172,8 @@ public class TimeMachine : MonoBehaviour, IDragHandler, IPointerDownHandler, IPo
         m_bar.sizeDelta = new Vector2(percentage * width, m_bar.sizeDelta.y);
 
         float actualPercentage = (date - m_startDate) / (float)(m_lengthDate * 0.01f);
+        float actualSPercentage = (dateB - m_startDate) / (float)(m_lengthDate * 0.01f);
 
-        OnTimeMachineUpdate?.Invoke(actualPercentage);
+        OnTimeMachineUpdate?.Invoke(actualPercentage, actualSPercentage);
     }
 }

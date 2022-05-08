@@ -42,7 +42,7 @@ public class MapCanvasLayers : MonoBehaviour
         m_layer?.SetActive(true);
     }
 
-    private void TimeUpdated(float obj)
+    private void TimeUpdated(float obj, float snap)
     {
         m_layerData.Formula.ComputeMin(out var min);
         m_layerData.Formula.ComputeMax(out var max);
@@ -64,7 +64,7 @@ public class MapCanvasLayers : MonoBehaviour
         if (layer.Type == MapType.Area)
             m_layer = MapboxPolygonDrawer.AddDepartmentPolygon(out m_layerId);
 
-        TimeUpdated(0f);
+        TimeUpdated(0f, 0f);
     }
     
     private void OnDestroy()
@@ -115,13 +115,13 @@ public class MapCanvasLayers : MonoBehaviour
 
     public void SetDirty()
     {
-        TimeUpdated(m_timeMachine.CurrentPercentage);
+        TimeUpdated(m_timeMachine.CurrentPercentage, m_timeMachine.SnapshotPercentage);
 
         int count = m_markers.Count;
         for (int i = 0; i < count; i++)
         {
             var spawnedObject = m_markers[i];
-            spawnedObject.TimeUpdated(m_timeMachine.CurrentPercentage);
+            spawnedObject.TimeUpdated(m_timeMachine.CurrentPercentage, m_timeMachine.SnapshotPercentage);
         }
     }
 

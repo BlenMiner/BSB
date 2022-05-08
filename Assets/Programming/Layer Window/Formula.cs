@@ -25,6 +25,24 @@ public class Formula
         public string Attribute;
     }
 
+    double pow(double x, double y) => Mathf.Pow((float)x, (float)y);
+
+    double sqrt(double x) => Mathf.Sqrt((float)x);
+
+    double sin(double x) => Mathf.Sin((float)x);
+
+    double cos(double x) => Mathf.Cos((float)x);
+
+    double tan(double x) => Mathf.Tan((float)x);
+
+    double round(double x) => Mathf.Round((float)x);
+
+    double ceil(double x) => Mathf.Ceil((float)x);
+
+    double floor(double x) => Mathf.Floor((float)x);
+
+    double pi() => Mathf.PI;
+
     public Formula(DatasetAutocompletion datasetInfo, string value, string defaultV = "")
     {
         if (value == "") value = defaultV;
@@ -33,6 +51,16 @@ public class Formula
         m_variables = new List<DatasetReference>();
 
         IsValid = Parse(datasetInfo, value);
+
+        m_parser.DefineFun("pow", pow, true);
+        m_parser.DefineFun("sqrt", sqrt, true);
+        m_parser.DefineFun("sin", sin, true);
+        m_parser.DefineFun("cos", cos, true);
+        m_parser.DefineFun("tan", tan, true);
+        m_parser.DefineFun("round", round, true);
+        m_parser.DefineFun("ceil", ceil, true);
+        m_parser.DefineFun("floor", floor, true);
+        m_parser.DefineFun("pi", pi, true);
     }
 
     bool Parse(DatasetAutocompletion datasetInfo, string expression)
@@ -54,15 +82,12 @@ public class Formula
                 case "pow":
                 case "min": 
                 case "max":
-                case "if":
-                case "switch":
                 case "sin":
                 case "cos":
                 case "tan":
-                case "sum":
                 case "round":
                 case "floor":
-                case "ceiling":
+                case "ceil":
                 case "pi":
                 parsedExpr.Append(variable);
                 return;
