@@ -25,30 +25,42 @@ public class LineChartScript : MonoBehaviour
         yAxis.type = Axis.AxisType.Value;
 
         chart.RemoveData();
-        chart.AddSerie<Line>("weather");
-        chart.AddSerie<Line>("pm10");
+        for (int j = 0; j < label.Length; j++)
+        {
+            chart.AddSerie<Line>(label[j]);
+        }
 
-        int i = 0;
-        DateTime futureDate = new DateTime(2022, 6, 29, 19, 30, 52);
-        for (DateTime date = start; end.CompareTo(date) > 0; date = date.AddDays(1.0))
+        
+
+
+        DateTime date = start;
+        while (end.CompareTo(date) > 0)
         {
             chart.AddXAxisData(date.ToString().Substring(0, 5));
-            chart.AddData("weather", data[0][i]);
-            chart.AddData("pm10", data[1][i]);
-            i++;
+            date = date.AddDays(1);
         }
+
+        int i = 0;
+        while (i < data.Length)
+        {
+            for (int j = 0; j < data[i].Length; j++)
+                chart.AddData(label[i], data[i][j]);
+            i += 1;
+        } 
     }
     // Start is called before the first frame update
     void Start()
     {
         DateTime date = DateTime.Now;
-        DateTime futureDate = new DateTime(2022, 5, 22, 19, 30, 52);
+        DateTime futureDate = new DateTime(2022, 5, 25, 23, 59, 59);
+        String[] label = { "weather", "pm10", "o3" };
         float[][] data = new float[][]
         {
             new float[] {23.5f, 24.0f, 28.3f, 22.0f, 20.0f },
-            new float[] {5f, 7f, 18f, 7f, 4f}
+            new float[] {5f, 7f, 18f, 7f, 4f},
+            new float[] {11f, 12f, 13f, 14f, 15f}
         };
-        UpdateGraph(date, futureDate, data, null);
+        UpdateGraph(date, futureDate, data, label);
 
 
     }
