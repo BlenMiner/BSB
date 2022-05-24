@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 using RewindSystem;
+using Random = UnityEngine.Random;
 
 public struct WeatherState
 {
@@ -281,8 +282,28 @@ public class WeatherDataset : Dataset
     public bool GetWeather(string departmentId, float timep100, out WeatherState value)
     {
         value = default;
+        bool addOffsets = false;
+        
+        if (departmentId != "91")
+        {
+            Random.InitState(int.Parse(departmentId));
+            departmentId = "91";
+            addOffsets = true;
+        }
+
         if (!m_timemachine.ContainsKey(departmentId)) return false;
         value = m_timemachine[departmentId].GetFrame(timep100);
+
+        if (addOffsets)
+        {
+            float timeOffset = Random.Range(-2000, 20000f) + timep100;
+            value.TemperatureMin24h += (Mathf.PerlinNoise(timeOffset, 0) - 0.5f) * 2f * 5f;
+            value.TemperatureMax24h += (Mathf.PerlinNoise(0, timeOffset + 200) - 0.5f) * 2f * 5f;
+
+            value.HumidityMax24h += (Mathf.PerlinNoise(timeOffset + 500, 0) - 0.5f) * 2f * 5f;
+            value.HumidityMin24h += (Mathf.PerlinNoise(0, timeOffset - 800) - 0.5f) * 2f * 5f;
+        }
+
         return true;
     }
 
