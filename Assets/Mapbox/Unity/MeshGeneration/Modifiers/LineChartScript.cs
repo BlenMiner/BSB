@@ -6,7 +6,7 @@ using XCharts.Runtime;
 
 public class LineChartScript : MonoBehaviour
 {
-    public void UpdateGraph(DateTime start, DateTime end, float[][] data, string[] label)
+    public LineChart UpdateGraph(DateTime start, DateTime end, float[][] data, string[] label)
     {
         var chart = gameObject.GetComponent<LineChart>();
         if (chart == null)
@@ -46,13 +46,34 @@ public class LineChartScript : MonoBehaviour
             for (int j = 0; j < data[i].Length; j++)
                 chart.AddData(label[i], data[i][j]);
             i += 1;
-        } 
+        }
+
+        return chart;
+    }
+
+    public void filterSerie(String[] seriesToFilter, LineChart chart, int nbOfSeries)
+    {
+        int i = 0;
+        while (i < nbOfSeries)
+        {
+            for (int j = 0; j < seriesToFilter.Length; j++)
+            {
+                String serieName = chart.GetSerie(i).serieName;
+                
+                if (!string.Equals(serieName, seriesToFilter[j], StringComparison.OrdinalIgnoreCase))
+                {
+                    chart.GetSerie(i).show = false;
+                    //chart.CovertSerie(chart.GetSerie(i))
+                }
+            }
+            i++;
+        }
     }
     // Start is called before the first frame update
     void Start()
     {
         DateTime date = DateTime.Now;
-        DateTime futureDate = new DateTime(2022, 5, 25, 23, 59, 59);
+        DateTime futureDate = new DateTime(2022, 5, 30, 23, 59, 59);
         String[] label = { "weather", "pm10", "o3" };
         float[][] data = new float[][]
         {
@@ -60,8 +81,9 @@ public class LineChartScript : MonoBehaviour
             new float[] {5f, 7f, 18f, 7f, 4f},
             new float[] {11f, 12f, 13f, 14f, 15f}
         };
-        UpdateGraph(date, futureDate, data, label);
-
+        LineChart chart = UpdateGraph(date, futureDate, data, label);
+        String[] seriesToFilter = { "pm10" };
+        filterSerie(seriesToFilter, chart, label.Length);
 
     }
 
