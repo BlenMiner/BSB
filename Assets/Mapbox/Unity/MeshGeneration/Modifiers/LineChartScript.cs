@@ -15,7 +15,7 @@ public class LineChartScript : MonoBehaviour
             chart.Init();
         }
         var title = chart.GetOrAddChartComponent<Title>();
-        title.text = "Données jusqu'au " + end.ToString().Substring(0, 5);
+        title.text = "DonnÃ©es jusqu'au " + end.ToString().Substring(0, 5);
 
         var xAxis = chart.GetOrAddChartComponent<XAxis>();
         xAxis.boundaryGap = true;
@@ -30,7 +30,7 @@ public class LineChartScript : MonoBehaviour
             chart.AddSerie<Line>(label[j]);
         }
 
-        
+
 
 
         DateTime date = start;
@@ -59,7 +59,7 @@ public class LineChartScript : MonoBehaviour
             for (int j = 0; j < seriesToFilter.Length; j++)
             {
                 String serieName = chart.GetSerie(i).serieName;
-                
+
                 if (!string.Equals(serieName, seriesToFilter[j], StringComparison.OrdinalIgnoreCase))
                 {
                     chart.GetSerie(i).show = false;
@@ -90,6 +90,6 @@ public class LineChartScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

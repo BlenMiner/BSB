@@ -1,7 +1,6 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MapLayerManager : MonoBehaviour
@@ -14,7 +13,7 @@ public class MapLayerManager : MonoBehaviour
     [SerializeField] GameObject m_entryPrefab;
 
     [Header("Map stuff")]
-    
+
     [SerializeField] RectTransform m_mapParent;
 
     [SerializeField] GameObject m_mapPrefab;
@@ -27,7 +26,7 @@ public class MapLayerManager : MonoBehaviour
 
     List<MapLayerPrefab> m_prefabs = new List<MapLayerPrefab>();
 
-    Dictionary<MapLayer, MapCanvasLayers> m_renderers = 
+    Dictionary<MapLayer, MapCanvasLayers> m_renderers =
         new Dictionary<MapLayer, MapCanvasLayers>();
 
     void LoadLayers()
@@ -40,7 +39,7 @@ public class MapLayerManager : MonoBehaviour
             {
                 MapLayerRawRaw[] rawLayers = Newtonsoft.Json.JsonConvert.DeserializeObject<MapLayerRawRaw[]>(str);
 
-                foreach(var layer in rawLayers)
+                foreach (var layer in rawLayers)
                 {
                     AddLayer(layer.ToLayer(m_autoCompletionProvider));
                 }
@@ -55,12 +54,13 @@ public class MapLayerManager : MonoBehaviour
 
     public void SaveLayers()
     {
-        try{
+        try
+        {
             List<MapLayerRawRaw> m_rawLayers = new List<MapLayerRawRaw>();
 
-            foreach(var l in m_layers)
+            foreach (var l in m_layers)
                 m_rawLayers.Add(l.ToRawLayer().ToRawRaw());
-            
+
             string save = Newtonsoft.Json.JsonConvert.SerializeObject(m_rawLayers.ToArray());
             PlayerPrefs.SetString("SAVE", save);
             PlayerPrefs.Save();
@@ -82,7 +82,7 @@ public class MapLayerManager : MonoBehaviour
 
         opts.Add(new TMP_Dropdown.OptionData("Prefabs"));
 
-        foreach(var p in m_rawPrefabs)
+        foreach (var p in m_rawPrefabs)
             opts.Add(new TMP_Dropdown.OptionData(p.Name));
 
         m_prefabList.AddOptions(opts);
@@ -104,7 +104,8 @@ public class MapLayerManager : MonoBehaviour
     {
         AddNewLayerWindow window = WindowManager.LastInstance.Push<AddNewLayerWindow>();
 
-        window.Setup(layer => {
+        window.Setup(layer =>
+        {
             AddLayer(layer);
         });
     }
@@ -129,7 +130,7 @@ public class MapLayerManager : MonoBehaviour
     public void RemoveLayer(MapLayer layer)
     {
         if (m_renderers.ContainsKey(layer)) Destroy(m_renderers[layer].gameObject);
-    
+
         m_layers.Remove(layer);
         LayersUpdated();
     }
