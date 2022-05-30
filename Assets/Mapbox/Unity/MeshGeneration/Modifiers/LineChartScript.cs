@@ -63,7 +63,6 @@ public class LineChartScript : MonoBehaviour
                 if (!string.Equals(serieName, seriesToFilter[j], StringComparison.OrdinalIgnoreCase))
                 {
                     chart.GetSerie(i).show = false;
-                    //chart.CovertSerie(chart.GetSerie(i))
                 }
             }
             i++;
@@ -73,7 +72,7 @@ public class LineChartScript : MonoBehaviour
     void Start()
     {
         DateTime date = DateTime.Now;
-        DateTime futureDate = new DateTime(2022, 5, 30, 23, 59, 59);
+        DateTime futureDate = date.AddDays(5).AddMinutes(1);
         String[] label = { "weather", "pm10", "o3" };
         float[][] data = new float[][]
         {
