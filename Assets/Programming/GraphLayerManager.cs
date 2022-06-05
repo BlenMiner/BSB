@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using WindinatorTools;
+using XCharts.Runtime;
 
 public class GraphLayerManager : MonoBehaviour
 {
@@ -17,14 +19,36 @@ public class GraphLayerManager : MonoBehaviour
 
     [SerializeField] GraphLayerRaw[] m_rawPrefabs;
 
+    [Inject] TimeMachine m_timeMachine;
+
     [Inject] DatasetAutocompletion m_autoCompletionProvider;
+
+    UIPool m_pool;
 
     List<GraphLayer> m_layers = new List<GraphLayer>();
 
+    DateTime m_timeA, m_timeB;
+
+    private void OnEnable()
+    {
+        m_timeMachine.OnTimeMachineUpdate += TimeDirty;
+        TimeDirty(0f, 0f);
+    }
+
+    private void OnDisable()
+    {
+        m_timeMachine.OnTimeMachineUpdate -= TimeDirty;
+    }
+
+    private void TimeDirty(float aTime, float bTime)
+    {
+        m_timeA = m_timeMachine.GetTime(aTime);
+        m_timeB = m_timeMachine.GetTime(bTime);
+    }
+
     private void Start()
     {
-        LoadLayers();
-
+        m_pool = new UIPool(m_entryPrefab, m_contentParent);
         m_prefabList.ClearOptions();
 
         var opts = new List<TMP_Dropdown.OptionData>();
@@ -36,6 +60,8 @@ public class GraphLayerManager : MonoBehaviour
 
         m_prefabList.AddOptions(opts);
         m_prefabList.onValueChanged.AddListener(OnAddPrefab);
+
+        LoadLayers();
     }
 
     private void OnAddPrefab(int id)
@@ -81,19 +107,49 @@ public class GraphLayerManager : MonoBehaviour
         }
     }
 
+    bool m_dirty = false;
+
     public void AddNewLayer()
     {
-
+        WindowManager.LastInstance.Push<CreateGraphWindow>().Setup(name =>
+        {
+            AddLayer(new GraphLayer
+            {
+                Name = name,
+                Formulas = new List<NamedFormula>()
+            });
+        });
     }
 
     public void AddLayer(GraphLayer layer)
     {
-        LayersUpdated();
+        m_layers.Add(layer);
+        m_dirty = true;
     }
 
     void LayersUpdated()
     {
+        foreach (var layer in m_layers)
+        {
+            var chart = m_pool.GetInstance<LineChartScript>();
+
+            chart.UpdateTitle(layer.Name);
+            chart.UpdateGraph(new DateTime(2017, 1, 1), new DateTime(2017, 12, 31),
+                m_timeA, m_timeB, layer.CalculateData(), layer.GetLabels());
+        }
+
+        m_pool.DiscardRest();
+
         SaveLayers();
+    }
+
+    private void Update()
+    {
+        if (m_dirty)
+        {
+            LayersUpdated();
+            m_dirty = false;
+        }
     }
 }
 
@@ -101,16 +157,63 @@ public class GraphLayer
 {
     public string Name;
 
-    public Formula Formula;
+    public List<NamedFormula> Formulas;
 
     public GraphLayerRaw ToRawLayer()
     {
+        RawNamedFormula[] rawFormulas = new RawNamedFormula[Formulas.Count];
+
+        for (int i = 0; i < rawFormulas.Length; ++i)
+            rawFormulas[i] = new RawNamedFormula
+            {
+                Name = Formulas[i].Name,
+                Formula = Formulas[i].Formula.RawText
+            };
+
         return new GraphLayerRaw()
         {
             Name = Name,
-            Formula = Formula.RawText
+            Formulas = rawFormulas
         };
     }
+
+    public string[] GetLabels()
+    {
+        string[] labels = new string[Formulas.Count];
+
+        for (int i = 0; i < labels.Length; ++i)
+            labels[i] = Formulas[i].Name;
+
+        return labels;
+    }
+
+    public float[][] CalculateData()
+    {
+        float[][] data = new float[Formulas.Count][];
+
+        for (int i = 0; i < data.Length; ++i)
+        {
+            data[i] = new float[365];
+            for (int j = 0; j < data[i].Length; ++j)
+            {
+                data[i][j] = Mathf.PerlinNoise(j * 0.5f, 0);
+            }
+        }
+
+        return data;
+    }
+}
+
+public struct NamedFormula
+{
+    public string Name;
+    public Formula Formula;
+}
+
+public struct RawNamedFormula
+{
+    public string Name;
+    public string Formula;
 }
 
 [System.Serializable]
@@ -118,14 +221,23 @@ public class GraphLayerRaw
 {
     public string Name;
 
-    public string Formula;
+    public RawNamedFormula[] Formulas;
 
     public GraphLayer ToLayer(DatasetAutocompletion datasetInfo)
     {
+        List<NamedFormula> formulas = new List<NamedFormula>(Formulas.Length);
+
+        for (int i = 0; i < Formulas.Length; ++i)
+            formulas.Add(new NamedFormula
+            {
+                Name = Formulas[i].Name,
+                Formula = new Formula(datasetInfo, Formulas[i].Formula)
+            });
+
         return new GraphLayer()
         {
             Name = Name,
-            Formula = new Formula(datasetInfo, Formula),
+            Formulas = formulas,
         };
     }
 
@@ -134,7 +246,7 @@ public class GraphLayerRaw
         return new GraphLayerRaw()
         {
             Name = Name,
-            Formula = Formula,
+            Formulas = Formulas,
         };
     }
 }

@@ -1,11 +1,12 @@
-
 using UnityEngine;
 
 namespace XCharts.Runtime
 {
     [System.Serializable]
     [SerieHandler(typeof(RingHandler), true)]
-    [SerieExtraComponent(typeof(LabelStyle), typeof(TitleStyle), typeof(Emphasis))]
+    [SerieExtraComponent(typeof(LabelStyle), typeof(TitleStyle), typeof(EmphasisItemStyle), typeof(EmphasisLabelStyle))]
+    [SerieDataExtraComponent(typeof(ItemStyle), typeof(LabelStyle), typeof(TitleStyle), typeof(EmphasisItemStyle), typeof(EmphasisLabelStyle))]
+    [SerieDataExtraField()]
     public class Ring : Serie
     {
         public override bool useDataNameForColor { get { return true; } }
@@ -31,6 +32,13 @@ namespace XCharts.Runtime
             var max = 100;
             chart.AddData(serie.index, value, max, "data1");
             return serie;
+        }
+
+        public override double GetDataTotal(int dimension, SerieData serieData = null)
+        {
+            if (serieData == null || serieData.data.Count <= 1)
+                return base.GetDataTotal(dimension, serieData);
+            return serieData.GetData(1);
         }
     }
 }

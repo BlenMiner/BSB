@@ -14,6 +14,8 @@ public class FormulaUI : MonoBehaviour
 
     [SerializeField] TMP_InputField m_formulaInput;
 
+    [SerializeField] GameObject m_minmaxContainer;
+
     [SerializeField] Rectangle m_forumlaBox;
 
     [SerializeField] Color m_validForumlaColor = Color.green, m_invalidForumlaColor = Color.red;
@@ -28,6 +30,9 @@ public class FormulaUI : MonoBehaviour
             Formula = new Formula(m_autoCompletionProvider, "", "1");
         m_formulaInput.onValueChanged
             .AddListener(OnFormulaUpdated);
+
+        m_errorText.gameObject.SetActive(false);
+        m_minmaxContainer.SetActive(true);
     }
 
     void OnDisable()
@@ -55,8 +60,18 @@ public class FormulaUI : MonoBehaviour
         m_forumlaBox.ShapeProperties.OutlineColor =
             validSyntax ? m_validForumlaColor : m_invalidForumlaColor;
 
-        if (!validSyntax) m_errorText.text = Formula.Error;
-        else m_errorText.text = string.Empty;
+        if (!validSyntax)
+        {
+            m_errorText.text = Formula.Error;
+            m_errorText.gameObject.SetActive(true);
+            m_minmaxContainer.SetActive(false);
+        }
+        else
+        {
+            m_errorText.text = string.Empty;
+            m_errorText.gameObject.SetActive(false);
+            m_minmaxContainer.SetActive(true);
+        }
 
         m_forumlaBox.SetAllDirty();
 

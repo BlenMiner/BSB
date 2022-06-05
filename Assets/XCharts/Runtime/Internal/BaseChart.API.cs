@@ -1,8 +1,8 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
 using System;
-using UnityEngine.UI;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace XCharts.Runtime
 {
@@ -100,12 +100,26 @@ namespace XCharts.Runtime
         /// the callback function of click bar.
         /// |点击柱形图柱条回调。参数：eventData, dataIndex
         /// </summary>
-        public Action<PointerEventData, int> onPointerClickBar { set { m_OnPointerClickBar = value; m_ForceOpenRaycastTarget = true; } }
+        public Action<PointerEventData, int> onPointerClickBar { set { m_OnPointerClickBar = value; m_ForceOpenRaycastTarget = true; } get { return m_OnPointerClickBar; } }
         /// <summary>
         /// 坐标轴变更数据索引时回调。参数：axis, dataIndex/dataValue
         /// </summary>
         public Action<Axis, double> onAxisPointerValueChanged { set { m_OnAxisPointerValueChanged = value; } get { return m_OnAxisPointerValueChanged; } }
-
+        /// <summary>
+        /// the callback function of click legend.
+        /// |点击图例按钮回调。参数：legendIndex, legendName, show
+        /// </summary>
+        public Action<Legend, int, string, bool> onLegendClick { set { m_OnLegendClick = value; } internal get { return m_OnLegendClick; } }
+        /// <summary>
+        /// the callback function of enter legend.
+        /// |鼠标进入图例回调。参数：legendIndex, legendName
+        /// </summary>
+        public Action<Legend, int, string> onLegendEnter { set { m_OnLegendEnter = value; } internal get { return m_OnLegendEnter; } }
+        /// <summary>
+        /// the callback function of exit legend.
+        /// |鼠标退出图例回调。参数：legendIndex, legendName
+        /// </summary>
+        public Action<Legend, int, string> onLegendExit { set { m_OnLegendExit = value; } internal get { return m_OnLegendExit; } }
         public void Init(bool defaultChart = true)
         {
             if (defaultChart)
@@ -128,6 +142,8 @@ namespace XCharts.Runtime
                 serie.ResetInteract();
             m_RefreshChart = true;
             if (m_Painter) m_Painter.Refresh();
+            foreach (var painter in m_PainterList) painter.Refresh();
+            if (m_PainterTop) m_PainterTop.Refresh();
         }
 
         /// <summary>
@@ -149,7 +165,6 @@ namespace XCharts.Runtime
             serie.ResetInteract();
             RefreshPainter(serie);
         }
-
 
         /// <summary>
         /// Remove all series and legend data.
@@ -360,7 +375,7 @@ namespace XCharts.Runtime
         public bool IsInChart(float x, float y)
         {
             if (x < m_ChartX || x > m_ChartX + m_ChartWidth ||
-               y < m_ChartY || y > m_ChartY + m_ChartHeight)
+                y < m_ChartY || y > m_ChartY + m_ChartHeight)
             {
                 return false;
             }
@@ -509,6 +524,19 @@ namespace XCharts.Runtime
         {
             var background = GetChartComponent<Background>();
             return theme.GetBackgroundColor(background);
+        }
+
+        public Color32 GetItemColor(Serie serie, SerieData serieData, bool highlight = false)
+        {
+            var colorIndex = serieData == null || !serie.useDataNameForColor ?
+                GetLegendRealShowNameIndex(serie.legendName) :
+                GetLegendRealShowNameIndex(serieData.legendName);
+            return SerieHelper.GetItemColor(serie, serieData, m_Theme, colorIndex, highlight);
+        }
+
+        public Color32 GetItemColor(Serie serie, bool highlight = false)
+        {
+            return SerieHelper.GetItemColor(serie, null, m_Theme, serie.context.colorIndex, highlight);
         }
     }
 }

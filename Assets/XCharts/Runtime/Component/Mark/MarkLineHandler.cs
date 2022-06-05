@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,6 +35,7 @@ namespace XCharts.Runtime
                 {
                     if (data.runtimeLabel != null)
                     {
+                        data.runtimeLabel.SetActive(data.label.show);
                         data.runtimeLabel.SetPosition(MarkLineHelper.GetLabelPosition(data));
                         data.runtimeLabel.SetText(MarkLineHelper.GetFormatterContent(serie, data));
                     }
@@ -48,7 +48,7 @@ namespace XCharts.Runtime
             var serie = chart.GetSerie(markLine.serieIndex);
             if (!serie.show || !markLine.show) return;
             ResetTempMarkLineGroupData(markLine);
-            var serieColor = (Color)chart.theme.GetColor(chart.GetLegendRealShowNameIndex(serie.serieName));
+            var serieColor = (Color) chart.GetItemColor(serie);
             if (m_TempGroupData.Count > 0)
             {
                 foreach (var kv in m_TempGroupData)
@@ -70,13 +70,12 @@ namespace XCharts.Runtime
         private void InitMarkLineLabel(Serie serie, MarkLineData data, Color serieColor)
         {
             data.painter = chart.m_PainterTop;
-            data.refreshComponent = delegate ()
+            data.refreshComponent = delegate()
             {
                 var textName = string.Format("markLine_{0}_{1}", serie.index, data.index);
                 var content = MarkLineHelper.GetFormatterContent(serie, data);
                 var label = ChartHelper.AddChartLabel(textName, m_MarkLineLabelRoot.transform, data.label, chart.theme.axis,
                     content, Color.clear, TextAnchor.MiddleCenter);
-                label.SetActive(data.label.show);
 
                 label.SetIconActive(false);
                 label.SetActive(data.label.show);
@@ -93,7 +92,7 @@ namespace XCharts.Runtime
             if (!serie.show || !markLine.show) return;
             if (markLine.data.Count == 0) return;
             var yAxis = chart.GetChartComponent<YAxis>(serie.yAxisIndex);
-            var xAxis = chart.GetChartComponent<XAxis>(serie.yAxisIndex);
+            var xAxis = chart.GetChartComponent<XAxis>(serie.xAxisIndex);
             var grid = chart.GetChartComponent<GridCoord>(xAxis.gridIndex);
             var dataZoom = chart.GetDataZoomOfAxis(xAxis);
             var animation = markLine.animation;
@@ -203,7 +202,8 @@ namespace XCharts.Runtime
             for (int i = 0; i < markLine.data.Count; i++)
             {
                 var data = markLine.data[i];
-                data.index = i;
+                // data.index = i;
+                data.index = markLine.index;
                 if (data.group == 0) continue;
                 if (!m_TempGroupData.ContainsKey(data.group))
                 {
@@ -242,11 +242,10 @@ namespace XCharts.Runtime
         private void DrawMarkLineSymbol(VertexHelper vh, SymbolStyle symbol, Serie serie, GridCoord grid, ThemeStyle theme,
             Vector3 pos, Vector3 startPos, Color32 lineColor)
         {
-            var symbolSize = symbol.GetSize(null, theme.serie.lineSymbolSize);
             var tickness = SerieHelper.GetSymbolBorder(serie, null, theme, false);
             var borderColor = SerieHelper.GetSymbolBorderColor(serie, null, theme, false);
             var cornerRadius = SerieHelper.GetSymbolCornerRadius(serie, null, false);
-            chart.DrawClipSymbol(vh, symbol.type, symbolSize, tickness, pos, lineColor, lineColor,
+            chart.DrawClipSymbol(vh, symbol.type, symbol.size, tickness, pos, lineColor, lineColor,
                 ColorUtil.clearColor32, borderColor, symbol.gap, true, cornerRadius, grid, startPos);
         }
 

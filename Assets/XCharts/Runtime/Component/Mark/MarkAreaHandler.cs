@@ -1,4 +1,3 @@
-
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -41,7 +40,7 @@ namespace XCharts.Runtime
         private void InitMarkArea(MarkArea markArea)
         {
             markArea.painter = chart.m_PainterTop;
-            markArea.refreshComponent = delegate ()
+            markArea.refreshComponent = delegate()
             {
                 var label = ChartHelper.AddChartLabel("label", m_MarkLineLabelRoot.transform, markArea.label, chart.theme.axis,
                     component.text, Color.clear, TextAnchor.MiddleCenter);
@@ -62,7 +61,7 @@ namespace XCharts.Runtime
 
             UpdateRuntimeData(markArea);
 
-            var colorIndex = chart.GetLegendRealShowNameIndex(serie.serieName);
+            var colorIndex = chart.GetLegendRealShowNameIndex(serie.legendName);
             var serieColor = SerieHelper.GetLineColor(serie, null, chart.theme, colorIndex, false);
             var areaColor = markArea.itemStyle.GetColor(serieColor);
             UGL.DrawRectangle(vh, markArea.runtimeRect, areaColor, areaColor);

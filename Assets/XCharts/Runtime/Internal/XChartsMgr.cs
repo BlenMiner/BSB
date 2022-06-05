@@ -1,8 +1,7 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.IO;
-using UnityEditor;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -21,8 +20,8 @@ namespace XCharts.Runtime
     [ExecuteInEditMode]
     public static class XChartsMgr
     {
-        public static readonly string version = "3.0.0-preview8";
-        public static readonly int versionDate = 20220426;
+        public static readonly string version = "3.0.0";
+        public static readonly int versionDate = 20220601;
         public static string fullVersion { get { return version + "-" + versionDate; } }
 
         internal static List<BaseChart> chartList = new List<BaseChart>();
@@ -127,6 +126,7 @@ namespace XCharts.Runtime
             }
         }
 
+#if UNITY_EDITOR
         public static string GetPackageFullPath()
         {
             string packagePath = Path.GetFullPath("Packages/com.monitor1394.xcharts");
@@ -167,8 +167,6 @@ namespace XCharts.Runtime
             }
             return null;
         }
-
-#if UNITY_EDITOR
 
         [UnityEditor.Callbacks.DidReloadScripts]
         static void OnEditorReload()

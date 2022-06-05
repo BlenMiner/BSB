@@ -22,7 +22,7 @@ namespace XCharts.Runtime
         [SerializeField] private Color32 m_BorderColor;
         [SerializeField] private Color32 m_BorderColor0;
         [SerializeField] private Color32 m_BorderToColor;
-        [SerializeField] [Range(0, 1)] private float m_Opacity = 1;
+        [SerializeField][Range(0, 1)] private float m_Opacity = 1;
         [SerializeField] private string m_ItemMarker;
         [SerializeField] private string m_ItemFormatter;
         [SerializeField] private string m_NumericFormatter = "";
@@ -110,6 +110,14 @@ namespace XCharts.Runtime
             set { if (PropertyUtil.SetColor(ref m_BackgroundColor, value)) SetVerticesDirty(); }
         }
         /// <summary>
+        /// 数据项背景宽度。
+        /// </summary>
+        public float backgroundWidth
+        {
+            get { return m_BackgroundWidth; }
+            set { if (PropertyUtil.SetStruct(ref m_BackgroundWidth, value)) SetVerticesDirty(); }
+        }
+        /// <summary>
         /// 中心区域颜色。
         /// </summary>
         public Color32 centerColor
@@ -124,14 +132,6 @@ namespace XCharts.Runtime
         {
             get { return m_CenterGap; }
             set { if (PropertyUtil.SetStruct(ref m_CenterGap, value)) SetVerticesDirty(); }
-        }
-        /// <summary>
-        /// 数据项背景宽度。
-        /// </summary>
-        public float backgroundWidth
-        {
-            get { return m_BackgroundWidth; }
-            set { if (PropertyUtil.SetStruct(ref m_BackgroundWidth, value)) SetVerticesDirty(); }
         }
         /// <summary>
         /// 边框的颜色。
@@ -237,7 +237,7 @@ namespace XCharts.Runtime
                 return m_Color;
 
             var color = m_Color;
-            color.a = (byte)(color.a * m_Opacity);
+            color.a = (byte) (color.a * m_Opacity);
             return color;
         }
 
@@ -247,7 +247,7 @@ namespace XCharts.Runtime
                 return m_ToColor;
 
             var color = m_ToColor;
-            color.a = (byte)(color.a * m_Opacity);
+            color.a = (byte) (color.a * m_Opacity);
             return color;
         }
 
@@ -257,7 +257,7 @@ namespace XCharts.Runtime
                 return m_Color0;
 
             var color = m_Color0;
-            color.a = (byte)(color.a * m_Opacity);
+            color.a = (byte) (color.a * m_Opacity);
             return color;
         }
 
@@ -268,7 +268,7 @@ namespace XCharts.Runtime
             if (m_Opacity == 1 || color.a == 0)
                 return color;
 
-            color.a = (byte)(color.a * m_Opacity);
+            color.a = (byte) (color.a * m_Opacity);
             return color;
         }
 
@@ -279,7 +279,7 @@ namespace XCharts.Runtime
             if (m_Opacity == 1 || color.a == 0)
                 return color;
 
-            color.a = (byte)(color.a * m_Opacity);
+            color.a = (byte) (color.a * m_Opacity);
             return color;
         }
 
@@ -290,7 +290,7 @@ namespace XCharts.Runtime
             if (m_Opacity == 1 || color.a == 0)
                 return color;
 
-            color.a = (byte)(color.a * m_Opacity);
+            color.a = (byte) (color.a * m_Opacity);
             return color;
         }
 
@@ -301,7 +301,7 @@ namespace XCharts.Runtime
             if (m_Opacity == 1 || color.a == 0)
                 return color;
 
-            color.a = (byte)(color.a * m_Opacity);
+            color.a = (byte) (color.a * m_Opacity);
             return color;
         }
 
@@ -332,7 +332,7 @@ namespace XCharts.Runtime
             }
             if (m_Opacity != 1)
             {
-                color.a = (byte)(color.a * m_Opacity);
+                color.a = (byte) (color.a * m_Opacity);
             }
             return color;
         }

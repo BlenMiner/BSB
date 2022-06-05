@@ -138,6 +138,16 @@ public class TimeMachine : MonoBehaviour, IDragHandler, IPointerDownHandler, IPo
         SetTime(0f);
     }
 
+    public DateTime GetTime(float percentage)
+    {
+        int len = m_subSpan.y - m_subSpan.x;
+
+        int date = m_subSpan.x + (int)(percentage * len / 100f);
+        var dateTime = WeatherDataset.START_DATE.AddDays(date);
+
+        return dateTime;
+    }
+
     public void SetSnapshot(float percentage)
     {
         percentage = Mathf.Max(0f, Mathf.Min(percentage, 100f));

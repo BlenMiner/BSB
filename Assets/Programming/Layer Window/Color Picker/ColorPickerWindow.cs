@@ -12,6 +12,8 @@ public class ColorPickerWindow : WindowBehaviour
 
     [SerializeField] Graphic m_currentColor;
 
+    [SerializeField] Slider m_alpha;
+
     private void OnEnable()
     {
         onWindowClose += OnWindowClose;
@@ -20,7 +22,7 @@ public class ColorPickerWindow : WindowBehaviour
 
     private void ColorChanged(Color obj)
     {
-        m_currentColor.color = obj;
+        m_currentColor.color = new Color(obj.r, obj.g, obj.b);
     }
 
     private void OnDisable()
@@ -31,13 +33,17 @@ public class ColorPickerWindow : WindowBehaviour
 
     private void OnWindowClose()
     {
-        m_onColorUpdated?.Invoke(m_colorPicker.color);
+        var c = m_colorPicker.color;
+        c.a = m_alpha.value;
+        m_onColorUpdated?.Invoke(c);
     }
 
     Action<Color> m_onColorUpdated;
 
     public void Setup(Color start, Action<Color> onColorUpdated)
     {
+        m_alpha.value = start.a;
+        start.a = 1f;
         m_onColorUpdated = onColorUpdated;
 
         m_currentColor.color = start;

@@ -148,11 +148,13 @@ PlayerSettings:
     enable360StereoCapture: 0
   isWsaHolographicRemotingEnabled: 0
   enableFrameTimingStats: 0
+  enableOpenGLProfilerGPURecorders: 1
   useHDRDisplay: 0
   D3DHDRBitDepth: 0
   m_ColorGamuts: 00000000
   targetPixelDensity: 30
   resolutionScalingMode: 0
+  resetResolutionOnWindowResize: 0
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
@@ -810,15 +812,22 @@ PlayerSettings:
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
     : UNITY_POST_PROCESSING_STACK_V2
-    Android: ARFOUNDATION_PRESENT
-    Nintendo Switch: UNITY_POST_PROCESSING_STACK_V2
-    PS4: UNITY_POST_PROCESSING_STACK_V2
-    Standalone: UNITY_POST_PROCESSING_STACK_V2
-    WebGL: UNITY_POST_PROCESSING_STACK_V2
-    Windows Store Apps: 
-    XboxOne: UNITY_POST_PROCESSING_STACK_V2
-    iPhone: UNITY_POST_PROCESSING_STACK_V2;ARFOUNDATION_PRESENT
-    tvOS: UNITY_POST_PROCESSING_STACK_V2
+    Android: ARFOUNDATION_PRESENT;dUI_TextMeshPro
+    CloudRendering: dUI_TextMeshPro
+    EmbeddedLinux: dUI_TextMeshPro
+    GameCoreScarlett: dUI_TextMeshPro
+    GameCoreXboxOne: dUI_TextMeshPro
+    Lumin: dUI_TextMeshPro
+    Nintendo Switch: UNITY_POST_PROCESSING_STACK_V2;dUI_TextMeshPro
+    PS4: UNITY_POST_PROCESSING_STACK_V2;dUI_TextMeshPro
+    PS5: dUI_TextMeshPro
+    Stadia: dUI_TextMeshPro
+    Standalone: UNITY_POST_PROCESSING_STACK_V2;dUI_TextMeshPro
+    WebGL: UNITY_POST_PROCESSING_STACK_V2;dUI_TextMeshPro
+    Windows Store Apps: dUI_TextMeshPro
+    XboxOne: UNITY_POST_PROCESSING_STACK_V2;dUI_TextMeshPro
+    iPhone: UNITY_POST_PROCESSING_STACK_V2;ARFOUNDATION_PRESENT;dUI_TextMeshPro
+    tvOS: UNITY_POST_PROCESSING_STACK_V2;dUI_TextMeshPro
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

@@ -46,6 +46,7 @@
 - [MainComponentHandler](#MainComponentHandler)
 - [MainComponentHandler<T>](#MainComponentHandler<T>)
 - [MathUtil](#MathUtil)
+- [ObjectPool<T> where T](#ObjectPool<T> where T)
 - [Painter](#Painter)
 - [ParallelChart](#ParallelChart)
 - [ParallelCoordContext](#ParallelCoordContext)
@@ -64,6 +65,8 @@
 - [SerieContext](#SerieContext)
 - [SerieConvertAttribute](#SerieConvertAttribute)
 - [SerieDataContext](#SerieDataContext)
+- [SerieDataExtraComponentAttribute](#SerieDataExtraComponentAttribute)
+- [SerieDataExtraFieldAttribute](#SerieDataExtraFieldAttribute)
 - [SerieExtraComponentAttribute](#SerieExtraComponentAttribute)
 - [SerieHandler](#SerieHandler)
 - [SerieHandler<T>](#SerieHandler<T>)
@@ -123,7 +126,7 @@ Inherits or Implemented: [MainComponentHandler](#MainComponentHandler)
 | `GetAxisPositionValue()` |public static double GetAxisPositionValue(float xy, float axisLength, double axisRange, float axisStart, float axisOffset)</br> |
 | `GetAxisPositionValue()` |public static double GetAxisPositionValue(GridCoord grid, Axis axis, Vector3 pos)</br> |
 | `GetAxisValueDistance()` |public static float GetAxisValueDistance(GridCoord grid, Axis axis, float scaleWidth, double value)</br>获得数值value在坐标轴上相对起点的距离 |
-| `GetAxisValueLength()` |public static float GetAxisValueLength(GridCoord grid, Axis axis, float scaleWidth, double value)</br>获得数值value在坐标轴上对于的长度 |
+| `GetAxisValueLength()` |public static float GetAxisValueLength(GridCoord grid, Axis axis, float scaleWidth, double value)</br>获得数值value在坐标轴上对应的长度 |
 | `GetAxisValuePosition()` |public static float GetAxisValuePosition(GridCoord grid, Axis axis, float scaleWidth, double value)</br>获得数值value在坐标轴上的坐标位置 |
 | `GetDataWidth()` |public static float GetDataWidth(Axis axis, float coordinateWidth, int dataCount, DataZoom dataZoom)</br>获得一个类目数据在坐标系中代表的宽度 |
 | `GetEachWidth()` |public static float GetEachWidth(Axis axis, float coordinateWidth, DataZoom dataZoom = null)</br> |
@@ -143,10 +146,12 @@ Inherits or Implemented: [BaseGraph](#BaseGraph),[ISerializationCallbackReceiver
 |public method|description|
 |--|--|
 | `AddChartComponent()` |public MainComponent AddChartComponent(Type type)</br> |
+| `AddData()` |public SerieData AddData(int serieIndex, DateTime time, double yValue, string dataName = null, string dataId = null)</br>添加（time,y）数据到指定的系列中。 |
 | `AddData()` |public SerieData AddData(int serieIndex, double data, string dataName = null, string dataId = null)</br>添加一个数据到指定的系列中。 |
 | `AddData()` |public SerieData AddData(int serieIndex, double open, double close, double lowest, double heighest, string dataName = null, string dataId = null)</br> |
 | `AddData()` |public SerieData AddData(int serieIndex, double xValue, double yValue, string dataName = null, string dataId = null)</br>添加（x,y）数据到指定系列中。 |
 | `AddData()` |public SerieData AddData(int serieIndex, List<double> multidimensionalData, string dataName = null, string dataId = null)</br>添加多维数据（x,y,z...）到指定的系列中。 |
+| `AddData()` |public SerieData AddData(string serieName, DateTime time, double yValue, string dataName = null, string dataId = null)</br>添加（time,y）数据到指定的系列中。 |
 | `AddData()` |public SerieData AddData(string serieName, double data, string dataName = null, string dataId = null)</br>If serieName doesn't exist in legend,will be add to legend. |
 | `AddData()` |public SerieData AddData(string serieName, double open, double close, double lowest, double heighest, string dataName = null, string dataId = null)</br> |
 | `AddData()` |public SerieData AddData(string serieName, double xValue, double yValue, string dataName = null, string dataId = null)</br>添加（x,y）数据到指定系列中。 |
@@ -180,6 +185,8 @@ Inherits or Implemented: [BaseGraph](#BaseGraph),[ISerializationCallbackReceiver
 | `GetDataZoomOfSerie()` |public void GetDataZoomOfSerie(Serie serie, out DataZoom xDataZoom, out DataZoom yDataZoom)</br> |
 | `GetGrid()` |public GridCoord GetGrid(Vector2 local)</br> |
 | `GetGridOfDataZoom()` |public GridCoord GetGridOfDataZoom(DataZoom dataZoom)</br> |
+| `GetItemColor()` |public Color32 GetItemColor(Serie serie, bool highlight = false)</br> |
+| `GetItemColor()` |public Color32 GetItemColor(Serie serie, SerieData serieData, bool highlight = false)</br> |
 | `GetLegendRealShowNameColor()` |public Color32 GetLegendRealShowNameColor(string name)</br> |
 | `GetLegendRealShowNameIndex()` |public int GetLegendRealShowNameIndex(string name)</br> |
 | `GetPainter()` |public Painter GetPainter(int index)</br> |
@@ -222,7 +229,9 @@ Inherits or Implemented: [BaseGraph](#BaseGraph),[ISerializationCallbackReceiver
 | `OnPointerUp()` |public override void OnPointerUp(PointerEventData eventData)</br> |
 | `OnScroll()` |public override void OnScroll(PointerEventData eventData)</br> |
 | `RefreshBasePainter()` |public void RefreshBasePainter()</br> |
-| `RefreshChart()` |public void RefreshChart()</br>在下一帧刷新图表。 |
+| `RefreshChart()` |public void RefreshChart()</br>在下一帧刷新整个图表。 |
+| `RefreshChart()` |public void RefreshChart(int serieIndex)</br>在下一帧刷新图表的指定serie。 |
+| `RefreshChart()` |public void RefreshChart(Serie serie)</br>在下一帧刷新图表的指定serie。 |
 | `RefreshDataZoom()` |public void RefreshDataZoom()</br>在下一帧刷新DataZoom |
 | `RefreshPainter()` |public void RefreshPainter(int index)</br> |
 | `RefreshPainter()` |public void RefreshPainter(Serie serie)</br> |
@@ -333,7 +342,7 @@ Inherits or Implemented: [BaseChart](#BaseChart)
 | `GetMaxDivisibleValue()` |public static double GetMaxDivisibleValue(double max, int ceilRate)</br> |
 | `GetMaxLogValue()` |public static double GetMaxLogValue(double value, float logBase, bool isLogBaseE, out int splitNumber)</br> |
 | `GetMinDivisibleValue()` |public static double GetMinDivisibleValue(double min, int ceilRate)</br> |
-| `GetMinLogValue()` |public static float GetMinLogValue(double value, float logBase, bool isLogBaseE, out int splitNumber)</br> |
+| `GetMinLogValue()` |public static double GetMinLogValue(double value, float logBase, bool isLogBaseE, out int splitNumber)</br> |
 | `GetPointList()` |public static void GetPointList(ref List<Vector3> posList, Vector3 sp, Vector3 ep, float k = 30f)</br> |
 | `GetPos()` |public static Vector3 GetPos(Vector3 center, float radius, float angle, bool isDegree = false)</br> |
 | `GetPosition()` |public static Vector3 GetPosition(Vector3 center, float angle, float radius)</br> |
@@ -371,9 +380,11 @@ Inherits or Implemented: [Image](#Image)
 
 |public method|description|
 |--|--|
+| `GetHeight()` |public float GetHeight()</br> |
 | `GetPosition()` |public Vector3 GetPosition()</br> |
 | `GetTextHeight()` |public float GetTextHeight()</br> |
 | `GetTextWidth()` |public float GetTextWidth()</br> |
+| `GetWidth()` |public float GetWidth()</br> |
 | `SetActive()` |public void SetActive(bool flag)</br> |
 | `SetIcon()` |public void SetIcon(Image image)</br> |
 | `SetIconActive()` |public void SetIconActive(bool flag)</br> |
@@ -476,6 +487,7 @@ Inherits or Implemented: [Attribute](#Attribute)
 
 |public method|description|
 |--|--|
+| `NeedFormat()` |public static bool NeedFormat(string content)</br> |
 | `ReplaceAxisLabelContent()` |public static void ReplaceAxisLabelContent(ref string content, string numericFormatter, double value)</br> |
 | `ReplaceAxisLabelContent()` |public static void ReplaceAxisLabelContent(ref string content, string value)</br> |
 | `TrimAndReplaceLine()` |public static string TrimAndReplaceLine(string content)</br> |
@@ -594,6 +606,18 @@ Inherits or Implemented: [MainComponentHandler](#MainComponentHandler)
 | `Clamp01()` |public static double Clamp01(double value)</br> |
 | `Lerp()` |public static double Lerp(double a, double b, double t)</br> |
 
+## `ObjectPool<T> where T`
+
+Inherits or Implemented: [new()](#new())
+
+|public method|description|
+|--|--|
+| `ClearAll()` |public void ClearAll()</br> |
+| `Get()` |public T Get()</br> |
+| `new()` |public class ObjectPool<T> where T : new()</br> |
+| `ObjectPool()` |public ObjectPool(UnityAction<T> actionOnGet, UnityAction<T> actionOnRelease, bool newIfEmpty = true)</br> |
+| `Release()` |public void Release(T element)</br> |
+
 ## `Painter`
 
 Inherits or Implemented: [MaskableGraphic](#MaskableGraphic)
@@ -672,7 +696,6 @@ Inherits or Implemented: [BaseChart](#BaseChart)
 
 |public method|description|
 |--|--|
-| `CopyFolder()` |public static bool CopyFolder(string sourPath, string destPath)</br> |
 | `GetAllAssemblyTypes()` |public static IEnumerable<Type> GetAllAssemblyTypes()</br> |
 | `GetAllTypesDerivedFrom()` |public static IEnumerable<Type> GetAllTypesDerivedFrom(Type type)</br> |
 | `GetAllTypesDerivedFrom<T>()` |public static IEnumerable<Type> GetAllTypesDerivedFrom<T>()</br> |
@@ -702,6 +725,38 @@ Inherits or Implemented: [Attribute](#Attribute)
 |--|--|
 | `Reset()` |public void Reset()</br> |
 
+## `SerieDataExtraComponentAttribute`
+
+Inherits or Implemented: [Attribute](#Attribute)
+
+|public method|description|
+|--|--|
+| `Contains()` |public bool Contains(Type type)</br> |
+| `SerieDataExtraComponentAttribute()` |public SerieDataExtraComponentAttribute()</br> |
+| `SerieDataExtraComponentAttribute()` |public SerieDataExtraComponentAttribute(Type type1)</br> |
+| `SerieDataExtraComponentAttribute()` |public SerieDataExtraComponentAttribute(Type type1, Type type2)</br> |
+| `SerieDataExtraComponentAttribute()` |public SerieDataExtraComponentAttribute(Type type1, Type type2, Type type3)</br> |
+| `SerieDataExtraComponentAttribute()` |public SerieDataExtraComponentAttribute(Type type1, Type type2, Type type3, Type type4)</br> |
+| `SerieDataExtraComponentAttribute()` |public SerieDataExtraComponentAttribute(Type type1, Type type2, Type type3, Type type4, Type type5)</br> |
+| `SerieDataExtraComponentAttribute()` |public SerieDataExtraComponentAttribute(Type type1, Type type2, Type type3, Type type4, Type type5, Type type6)</br> |
+| `SerieDataExtraComponentAttribute()` |public SerieDataExtraComponentAttribute(Type type1, Type type2, Type type3, Type type4, Type type5, Type type6, Type type7)</br> |
+
+## `SerieDataExtraFieldAttribute`
+
+Inherits or Implemented: [Attribute](#Attribute)
+
+|public method|description|
+|--|--|
+| `Contains()` |public bool Contains(string field)</br> |
+| `SerieDataExtraFieldAttribute()` |public SerieDataExtraFieldAttribute()</br> |
+| `SerieDataExtraFieldAttribute()` |public SerieDataExtraFieldAttribute(string field1)</br> |
+| `SerieDataExtraFieldAttribute()` |public SerieDataExtraFieldAttribute(string field1, string field2)</br> |
+| `SerieDataExtraFieldAttribute()` |public SerieDataExtraFieldAttribute(string field1, string field2, string field3)</br> |
+| `SerieDataExtraFieldAttribute()` |public SerieDataExtraFieldAttribute(string field1, string field2, string field3, string field4)</br> |
+| `SerieDataExtraFieldAttribute()` |public SerieDataExtraFieldAttribute(string field1, string field2, string field3, string field4, string field5)</br> |
+| `SerieDataExtraFieldAttribute()` |public SerieDataExtraFieldAttribute(string field1, string field2, string field3, string field4, string field5, string field6)</br> |
+| `SerieDataExtraFieldAttribute()` |public SerieDataExtraFieldAttribute(string field1, string field2, string field3, string field4, string field5, string field6, string field7)</br> |
+
 ## `SerieExtraComponentAttribute`
 
 Inherits or Implemented: [Attribute](#Attribute)
@@ -726,6 +781,8 @@ Inherits or Implemented: [SerieHandler where T](#SerieHandler where T),[Serie](#
 
 |public method|description|
 |--|--|
+| `GetSerieDataAutoColor()` |public virtual Color GetSerieDataAutoColor(SerieData serieData)</br> |
+| `GetSerieDataLabelOffset()` |public virtual Vector3 GetSerieDataLabelOffset(SerieData serieData, LabelStyle label)</br> |
 | `GetSerieDataLabelPosition()` |public virtual Vector3 GetSerieDataLabelPosition(SerieData serieData, LabelStyle label)</br> |
 | `GetSerieDataTitlePosition()` |public virtual Vector3 GetSerieDataTitlePosition(SerieData serieData, TitleStyle titleStyle)</br> |
 | `InitComponent()` |public override void InitComponent()</br> |
@@ -757,13 +814,13 @@ Inherits or Implemented: [Attribute](#Attribute)
 | `GetAreaStyle()` |public static AreaStyle GetAreaStyle(Serie serie, SerieData serieData)</br> |
 | `GetAreaToColor()` |public static Color32 GetAreaToColor(Serie serie, SerieData serieData, ThemeStyle theme, int index, bool highlight)</br> |
 | `GetAverageData()` |public static double GetAverageData(Serie serie, int dimension = 1, DataZoom dataZoom = null)</br> |
-| `GetItemColor()` |public static Color32 GetItemColor(Serie serie, SerieData serieData, ThemeStyle theme, int index, bool highlight)</br> |
+| `GetItemColor()` |public static Color32 GetItemColor(Serie serie, SerieData serieData, ThemeStyle theme, int index, bool highlight, bool opacity = true)</br> |
 | `GetItemColor0()` |public static Color32 GetItemColor0(Serie serie, SerieData serieData, ThemeStyle theme, bool highlight, Color32 defaultColor)</br> |
 | `GetItemFormatter()` |public static string GetItemFormatter(Serie serie, SerieData serieData, string defaultFormatter = null)</br> |
 | `GetItemMarker()` |public static string GetItemMarker(Serie serie, SerieData serieData, string defaultMarker = null)</br> |
 | `GetItemStyle()` |public static ItemStyle GetItemStyle(Serie serie, SerieData serieData, bool highlight = false)</br> |
 | `GetItemStyleEmphasis()` |public static ItemStyle GetItemStyleEmphasis(Serie serie, SerieData serieData)</br> |
-| `GetItemToColor()` |public static Color32 GetItemToColor(Serie serie, SerieData serieData, ThemeStyle theme, int index, bool highlight)</br> |
+| `GetItemToColor()` |public static Color32 GetItemToColor(Serie serie, SerieData serieData, ThemeStyle theme, int index, bool highlight, bool opacity = true)</br> |
 | `GetLineColor()` |public static Color32 GetLineColor(Serie serie, SerieData serieData, ThemeStyle theme, int index, bool highlight)</br> |
 | `GetLineStyle()` |public static LineStyle GetLineStyle(Serie serie, SerieData serieData)</br> |
 | `GetMaxData()` |public static double GetMaxData(Serie serie, int dimension = 1, DataZoom dataZoom = null)</br> |
@@ -776,7 +833,7 @@ Inherits or Implemented: [Attribute](#Attribute)
 | `GetSerieEmphasisLabel()` |public static LabelStyle GetSerieEmphasisLabel(Serie serie, SerieData serieData)</br> |
 | `GetSerieLabel()` |public static LabelStyle GetSerieLabel(Serie serie, SerieData serieData, bool highlight = false)</br> |
 | `GetSerieLabelLine()` |public static LabelLine GetSerieLabelLine(Serie serie, SerieData serieData, bool highlight = false)</br> |
-| `GetSerieSymbol()` |public static SymbolStyle GetSerieSymbol(Serie serie, SerieData serieData)</br> |
+| `GetSerieSymbol()` |public static SerieSymbol GetSerieSymbol(Serie serie, SerieData serieData)</br> |
 | `GetSymbolBorder()` |public static float GetSymbolBorder(Serie serie, SerieData serieData, ThemeStyle theme, bool highlight)</br> |
 | `GetSymbolBorder()` |public static float GetSymbolBorder(Serie serie, SerieData serieData, ThemeStyle theme, bool highlight, float defaultWidth)</br> |
 | `GetSymbolBorderColor()` |public static Color32 GetSymbolBorderColor(Serie serie, SerieData serieData, ThemeStyle theme, bool highlight)</br> |
@@ -930,6 +987,8 @@ Inherits or Implemented: [MaskableGraphic](#MaskableGraphic)
 | `GetVertialDire()` |public static Vector3 GetVertialDire(Vector3 dire)</br> |
 | `IsClearColor()` |public static bool IsClearColor(Color color)</br> |
 | `IsClearColor()` |public static bool IsClearColor(Color32 color)</br> |
+| `IsPointInPolygon()` |public static bool IsPointInPolygon(Vector3 p, List<Vector2> polyons)</br> |
+| `IsPointInPolygon()` |public static bool IsPointInPolygon(Vector3 p, List<Vector3> polyons)</br> |
 | `IsPointInTriangle()` |public static bool IsPointInTriangle(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 check)</br> |
 | `IsValueEqualsColor()` |public static bool IsValueEqualsColor(Color color1, Color color2)</br> |
 | `IsValueEqualsColor()` |public static bool IsValueEqualsColor(Color32 color1, Color32 color2)</br> |

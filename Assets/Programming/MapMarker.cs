@@ -89,8 +89,8 @@ public class MapMarker : MonoBehaviour
 
             if (m_material != null)
             {
-                m_material.SetColor("_Color", new Color(color.r, color.g, color.b, 0.5f));
-                m_material.SetColor("_ColorB", new Color(colorB.r, colorB.g, colorB.b, 0.5f));
+                m_material.SetColor("_Color", color);
+                m_material.SetColor("_ColorB", colorB);
             }
 
             if (m_layerData.Type != MapType.Area && !m_shape.enabled)

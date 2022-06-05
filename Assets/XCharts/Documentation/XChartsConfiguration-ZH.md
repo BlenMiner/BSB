@@ -47,6 +47,7 @@
 - [Axis](#Axis)
 - [Background](#Background)
 - [CalendarCoord](#CalendarCoord)
+- [Comment](#Comment)
 - [CoordSystem](#CoordSystem)
 - [DataZoom](#DataZoom)
 - [GridCoord](#GridCoord)
@@ -82,9 +83,14 @@
 - [AxisTick](#AxisTick)
 - [BaseAxisTheme](#BaseAxisTheme)
 - [BaseLine](#BaseLine)
+- [CommentItem](#CommentItem)
+- [CommentMarkStyle](#CommentMarkStyle)
 - [ComponentTheme](#ComponentTheme)
 - [DataZoomTheme](#DataZoomTheme)
 - [Emphasis](#Emphasis)
+- [EmphasisItemStyle](#EmphasisItemStyle)
+- [EmphasisLabelLine](#EmphasisLabelLine)
+- [EmphasisLabelStyle](#EmphasisLabelStyle)
 - [EndLabelStyle](#EndLabelStyle)
 - [IconStyle](#IconStyle)
 - [ImageStyle](#ImageStyle)
@@ -103,6 +109,7 @@
 - [RadarAxisTheme](#RadarAxisTheme)
 - [RadiusAxisTheme](#RadiusAxisTheme)
 - [SerieData](#SerieData)
+- [SerieSymbol](#SerieSymbol)
 - [SerieTheme](#SerieTheme)
 - [StageColor](#StageColor)
 - [SubTitleTheme](#SubTitleTheme)
@@ -114,13 +121,16 @@
 - [TitleStyle](#TitleStyle)
 - [TitleTheme](#TitleTheme)
 - [TooltipTheme](#TooltipTheme)
-- [VisualMapPieces](#VisualMapPieces)
+- [VisualMapRange](#VisualMapRange)
 - [VisualMapTheme](#VisualMapTheme)
 
 ## ISerieExtraComponent Serie额外组件
 
 - [AreaStyle](#AreaStyle)
 - [Emphasis](#Emphasis)
+- [EmphasisItemStyle](#EmphasisItemStyle)
+- [EmphasisLabelLine](#EmphasisLabelLine)
+- [EmphasisLabelStyle](#EmphasisLabelStyle)
 - [ImageStyle](#ImageStyle)
 - [LabelLine](#LabelLine)
 - [LabelStyle](#LabelStyle)
@@ -131,12 +141,15 @@
 
 - [AreaStyle](#AreaStyle)
 - [Emphasis](#Emphasis)
+- [EmphasisItemStyle](#EmphasisItemStyle)
+- [EmphasisLabelLine](#EmphasisLabelLine)
+- [EmphasisLabelStyle](#EmphasisLabelStyle)
 - [ImageStyle](#ImageStyle)
 - [ItemStyle](#ItemStyle)
 - [LabelLine](#LabelLine)
 - [LabelStyle](#LabelStyle)
 - [LineStyle](#LineStyle)
-- [SymbolStyle](#SymbolStyle)
+- [SerieSymbol](#SerieSymbol)
 - [TitleStyle](#TitleStyle)
 
 ## Other 其他
@@ -411,6 +424,45 @@ Inherits or Implemented: [Serie](#Serie),[INeedSerieContainer](#INeedSerieContai
 ## `ChildComponent`
 
 
+## `Comment`
+
+Inherits or Implemented: [MainComponent](#MainComponent)
+
+图表注解组件。
+
+|field|default|comment|
+|--|--|--|
+| `show` |true | 是否显示注解组件。 |
+| `labelStyle` | | 所有组件的文本样式。 [LabelStyle](LabelStyle)|
+| `markStyle` | | 所有组件的文本样式。 [CommentMarkStyle](CommentMarkStyle)|
+| `items` | |  |
+
+## `CommentItem`
+
+Inherits or Implemented: [ChildComponent](#ChildComponent)
+
+注解项。
+
+|field|default|comment|
+|--|--|--|
+| `show` |true | 是否显示当前注解项。 |
+| `content` | | 注解的文本内容。 |
+| `position` | | 注解项的位置坐标。 |
+| `markRect` | |  |
+| `markStyle` | |  [CommentMarkStyle](CommentMarkStyle)|
+| `labelStyle` | | 注解项的文本样式。 [LabelStyle](LabelStyle)|
+
+## `CommentMarkStyle`
+
+Inherits or Implemented: [ChildComponent](#ChildComponent)
+
+注解项。
+
+|field|default|comment|
+|--|--|--|
+| `show` |true | 是否显示当前注解项。 |
+| `lineStyle` | |  [LineStyle](LineStyle)|
+
 ## `ComponentTheme`
 
 Inherits or Implemented: [ChildComponent](#ChildComponent)
@@ -512,6 +564,27 @@ Inherits or Implemented: [ChildComponent](#ChildComponent),[ISerieExtraComponent
 | `label` | | 图形文本标签。 [LabelStyle](LabelStyle)|
 | `labelLine` | |  [LabelLine](LabelLine)|
 | `itemStyle` | | 图形样式。 [ItemStyle](ItemStyle)|
+
+## `EmphasisItemStyle`
+
+Inherits or Implemented: [ItemStyle](#ItemStyle),[ISerieExtraComponent](#ISerieExtraComponent),[ISerieDataComponent](#ISerieDataComponent)
+
+高亮的图形样式
+
+
+## `EmphasisLabelLine`
+
+Inherits or Implemented: [LabelLine](#LabelLine),[ISerieExtraComponent](#ISerieExtraComponent),[ISerieDataComponent](#ISerieDataComponent)
+
+高亮的标签引导线样式
+
+
+## `EmphasisLabelStyle`
+
+Inherits or Implemented: [LabelStyle](#LabelStyle),[ISerieExtraComponent](#ISerieExtraComponent),[ISerieDataComponent](#ISerieDataComponent)
+
+高亮的标签样式
+
 
 ## `EndLabelStyle`
 
@@ -633,15 +706,20 @@ Inherits or Implemented: [ChildComponent](#ChildComponent),[ISerieDataComponent]
 
 Inherits or Implemented: [ChildComponent](#ChildComponent),[ISerieExtraComponent](#ISerieExtraComponent),[ISerieDataComponent](#ISerieDataComponent)
 
+标签的引导线
+
 |field|default|comment|
 |--|--|--|
 | `show` |true | 是否显示视觉引导线。 |
-| `lineType` | | 视觉引导线类型。</br>`LineType`:</br>- `Normal`: the normal line chart， 普通折线图。</br>- `Smooth`: the smooth line chart， 平滑曲线。</br>- `StepStart`: 阶梯线图：当前点。</br>- `StepMiddle`: 阶梯线图：当前点和下一个点的中间。</br>- `StepEnd`: 阶梯线图：下一个拐点。</br>|
+| `lineType` | | 视觉引导线类型。</br>`LineType`:</br>- `Normal`: 普通折线图。</br>- `Smooth`: 平滑曲线。</br>- `StepStart`: 阶梯线图：当前点。</br>- `StepMiddle`: 阶梯线图：当前点和下一个点的中间。</br>- `StepEnd`: 阶梯线图：下一个拐点。</br>|
 | `lineColor` |ChartConst.clearColor32 | 视觉引导线颜色。默认和serie一致取自调色板。 |
+| `lineAngle` |0 | 视觉引导线的固定角度。对折线和曲线有效。 |
 | `lineWidth` |1.0f | 视觉引导线的宽度。 |
 | `lineGap` |1.0f | 视觉引导线和容器的间距。 |
 | `lineLength1` |25f | 视觉引导线第一段的长度。 |
 | `lineLength2` |15f | 视觉引导线第二段的长度。 |
+| `startSymbol` | | 起始点的图形标记。 [SymbolStyle](SymbolStyle)|
+| `endSymbol` | | 结束点的图形标记。 [SymbolStyle](SymbolStyle)|
 
 ## `LabelStyle`
 
@@ -696,11 +774,13 @@ Inherits or Implemented: [MainComponent](#MainComponent),[IPropertyChanged](#IPr
 | `itemHeight` |12.0f | 图例标记的图形高度。 [default:12f] |
 | `itemGap` |10f | 图例每项之间的间隔。横向布局时为水平间隔，纵向布局时为纵向间隔。 [default:10f] |
 | `itemAutoColor` |true | 图例标记的图形是否自动匹配颜色。 [default:true] |
-| `textAutoColor` |false | 图例标记的文本是否自动匹配颜色。 [default:false] |
+| `itemOpacity` |1 | 图例标记的图形的颜色透明度。 |
 | `formatter` | |  |
+| `numericFormatter` | | 标准数字格式字符串。用于将数值格式化显示为字符串。 使用Axx的形式：A是格式说明符的单字符，支持C货币、D十进制、E指数、F定点数、G常规、N数字、P百分比、R往返、X十六进制的。xx是精度说明，从0-99。 参考：https://docs.microsoft.com/zh-cn/dotnet/standard/base-types/standard-numeric-format-strings |
 | `labelStyle` | | 文本样式。 [LabelStyle](LabelStyle)|
 | `data` | | If data is not specified, it will be auto collected from series. |
 | `icons` | | 自定义的图例标记图形。 |
+| `colors` | |  |
 
 ## `LegendTheme`
 
@@ -741,7 +821,7 @@ Inherits or Implemented: [ChildComponent](#ChildComponent),[ISerieExtraComponent
 |field|default|comment|
 |--|--|--|
 | `show` | | 是否显示箭头。 |
-| `position` | | 箭头位置。</br>`LineArrow.Position`:</br>- `End`: 末端箭头</br>- `Start`: 头端箭头</br>|
+| `position` | | 箭头位置。</br>`LabelStyle.Position`:</br>- `Default`: 标签的位置。</br>- `Outside`: 饼图扇区外侧，通过视觉引导线连到相应的扇区。</br>- `Inside`: 饼图扇区内部。</br>- `Center`: 在饼图中心位置。</br>- `Top`: 图形标志的顶部。</br>- `Bottom`: 图形标志的底部。</br>- `Left`: 图形标志的左边。</br>- `Right`: 图形标志的右边。</br>- `Start`: 线的起始点。</br>- `Middle`: 线的中点。</br>- `End`: 线的结束点。</br>|
 | `arrow` | | 箭头。 [ArrowStyle](ArrowStyle)|
 
 ## `LineStyle`
@@ -946,7 +1026,9 @@ Inherits or Implemented: [BaseSerie](#BaseSerie),[IComparable](#IComparable)
 | `lineArrows` | |  |
 | `areaStyles` | |  |
 | `titleStyles` | |  |
-| `emphases` | |  |
+| `emphasisItemStyles` | |  |
+| `emphasisLabels` | |  |
+| `emphasisLabelLines` | |  |
 | `index` | | 系列索引。 |
 | `show` |true | 系列是否显示在图表上。 |
 | `coordSystem` | | 使用的坐标系。 |
@@ -966,11 +1048,11 @@ Inherits or Implemented: [BaseSerie](#BaseSerie),[IComparable](#IComparable)
 | `sampleDist` |0 | 采样的最小像素距离，默认为0时不采样。当两个数据点间的水平距离小于改值时，开启采样，保证两点间的水平距离不小于改值。 |
 | `sampleType` | | 采样类型。当sampleDist大于0时有效。</br>`SampleType`:</br>- `Peak`: 取峰值。</br>- `Average`: 取过滤点的平均值。</br>- `Max`: 取过滤点的最大值。</br>- `Min`: 取过滤点的最小值。</br>- `Sum`: 取过滤点的和。</br>|
 | `sampleAverage` |0 | 设定的采样平均值。当sampleType 为 Peak 时，用于和过滤数据的平均值做对比是取最大值还是最小值。默认为0时会实时计算所有数据的平均值。 |
-| `lineType` | | 折线图样式类型。</br>`LineType`:</br>- `Normal`: the normal line chart， 普通折线图。</br>- `Smooth`: the smooth line chart， 平滑曲线。</br>- `StepStart`: 阶梯线图：当前点。</br>- `StepMiddle`: 阶梯线图：当前点和下一个点的中间。</br>- `StepEnd`: 阶梯线图：下一个拐点。</br>|
-| `barType` | | 柱形图类型。</br>`BarType`:</br>- `Normal`: 普通柱形图</br>- `Zebra`: 斑马柱形图</br>- `Capsule`: 胶囊柱形图</br>|
+| `lineType` | | 折线图样式类型。</br>`LineType`:</br>- `Normal`: 普通折线图。</br>- `Smooth`: 平滑曲线。</br>- `StepStart`: 阶梯线图：当前点。</br>- `StepMiddle`: 阶梯线图：当前点和下一个点的中间。</br>- `StepEnd`: 阶梯线图：下一个拐点。</br>|
+| `barType` | | 柱形图类型。</br>`BarType`:</br>- `Normal`: 普通柱形图。</br>- `Zebra`: 斑马柱形图。</br>- `Capsule`: 胶囊柱形图。</br>|
 | `barPercentStack` |false | 柱形图是否为百分比堆积。相同stack的serie只要有一个barPercentStack为true，则就显示成百分比堆叠柱状图。 |
-| `barWidth` |0.6f | 柱条的宽度，不设时自适应。支持设置成相对于类目宽度的百分比。 |
-| `barGap` |0.3f; // 30 | <para>Set barGap as '-1' can overlap bars that belong to different series, which is useful when making a series of bar be background. |
+| `barWidth` |0 | 柱条的宽度，不设时自适应。支持设置成相对于类目宽度的百分比。 |
+| `barGap` |0.1f | <para>Set barGap as '-1' can overlap bars that belong to different series, which is useful when making a series of bar be background. |
 | `barZebraWidth` |4f | 斑马线的粗细。 |
 | `barZebraGap` |2f | 斑马线的间距。 |
 | `min` | | 最小值。 |
@@ -984,7 +1066,7 @@ Inherits or Implemented: [BaseSerie](#BaseSerie),[IComparable](#IComparable)
 | `roundCap` | | 是否开启圆弧效果。 |
 | `splitNumber` | | 刻度分割段数。最大可设置36。 |
 | `clickOffset` |true | 鼠标点击时是否开启偏移，一般用在PieChart图表中。 |
-| `roseType` | | 是否展示成南丁格尔图，通过半径区分数据大小。</br>`RoseType`:</br>- `None`: Don't show as Nightingale chart.不展示成南丁格尔玫瑰图</br>- `Radius`: 扇区圆心角展现数据的百分比，半径展现数据的大小。</br>- `Area`: 所有扇区圆心角相同，仅通过半径展现数据大小。</br>|
+| `roseType` | | 是否展示成南丁格尔图，通过半径区分数据大小。</br>`RoseType`:</br>- `None`: 不展示成南丁格尔玫瑰图。</br>- `Radius`: 扇区圆心角展现数据的百分比，半径展现数据的大小。</br>- `Area`: 所有扇区圆心角相同，仅通过半径展现数据大小。</br>|
 | `gap` | | 间距。 |
 | `center` | | 中心点。 |
 | `radius` | | 半径。radius[0]表示内径，radius[1]表示外径。 |
@@ -1010,7 +1092,7 @@ Inherits or Implemented: [BaseSerie](#BaseSerie),[IComparable](#IComparable)
 | `bottom` | | 组件离容器下侧的距离。 |
 | `insertDataToHead` | | 添加新数据时是在列表的头部还是尾部加入。 |
 | `lineStyle` | | 线条样式。 [LineStyle](LineStyle)|
-| `symbol` | | 标记的图形。 [SymbolStyle](SymbolStyle)|
+| `symbol` | | 标记的图形。 [SerieSymbol](SerieSymbol)|
 | `animation` | | 起始动画。 [AnimationStyle](AnimationStyle)|
 | `itemStyle` | | 图形样式。 [ItemStyle](ItemStyle)|
 | `data` | | 系列中的数据内容数组。SerieData可以设置1到n维数据。 |
@@ -1027,15 +1109,40 @@ Inherits or Implemented: [ChildComponent](#ChildComponent)
 | `name` | | 数据项名称。 |
 | `id` | | 数据项的唯一id。唯一id不是必须设置的。 |
 | `parentId` | |  |
+| `ignore` | | 是否忽略数据。当为 true 时，数据不进行绘制。 |
+| `selected` | | 该数据项是否被选中。 |
+| `radius` | | 自定义半径。可用在饼图中自定义某个数据项的半径。 |
 | `itemStyles` | |  |
 | `labels` | |  |
 | `labelLines` | |  |
-| `emphases` | |  |
 | `symbols` | |  |
 | `lineStyles` | |  |
 | `areaStyles` | |  |
 | `titleStyles` | |  |
+| `emphasisItemStyles` | |  |
+| `emphasisLabels` | |  |
+| `emphasisLabelLines` | |  |
 | `data` | | 可指定任意维数的数值列表。 |
+
+## `SerieSymbol`
+
+Inherits or Implemented: [SymbolStyle](#SymbolStyle),[ISerieDataComponent](#ISerieDataComponent)
+
+系列数据项的标记的图形
+
+|field|default|comment|
+|--|--|--|
+| `sizeType` | | 标记图形的大小获取方式。</br>`SymbolSizeType`:</br>- `Custom`: 自定义大小。</br>- `FromData`: 通过 dataIndex 从数据中获取，再乘以一个比例系数 dataScale 。</br>- `Function`: 通过委托函数获取。</br>|
+| `selectedSize` |0f | 被选中的标记的大小。 |
+| `dataIndex` |1 | 当sizeType指定为FromData时，指定的数据源索引。 |
+| `dataScale` |1 | 当sizeType指定为FromData时，指定的倍数系数。 |
+| `selectedDataScale` |1.5f | 当sizeType指定为FromData时，指定的高亮倍数系数。 |
+| `sizeFunction` | | 当sizeType指定为Function时，指定的委托函数。 |
+| `selectedSizeFunction` | | 当sizeType指定为Function时，指定的高亮委托函数。 |
+| `startIndex` | | 开始显示图形标记的索引。 |
+| `interval` | | 显示图形标记的间隔。0表示显示所有标签，1表示隔一个隔显示一个标签，以此类推。 |
+| `forceShowLast` |false | 是否强制显示最后一个图形标记。 |
+| `repeat` |false | 图形是否重复。 |
 
 ## `SerieTheme`
 
@@ -1128,7 +1235,7 @@ Inherits or Implemented: [ComponentTheme](#ComponentTheme)
 
 ## `SymbolStyle`
 
-Inherits or Implemented: [ChildComponent](#ChildComponent),[ISerieDataComponent](#ISerieDataComponent)
+Inherits or Implemented: [ChildComponent](#ChildComponent)
 
 系列数据项的标记的图形
 
@@ -1136,24 +1243,14 @@ Inherits or Implemented: [ChildComponent](#ChildComponent),[ISerieDataComponent]
 |--|--|--|
 | `show` |true | 是否显示标记。 |
 | `type` | | 标记类型。</br>`SymbolType`:</br>- `None`: 不显示标记。</br>- `Custom`: 自定义标记。</br>- `Circle`: 圆形。</br>- `EmptyCircle`: 空心圆。</br>- `Rect`: 正方形。可通过设置`itemStyle`的`cornerRadius`变成圆角矩形。</br>- `EmptyRect`: 空心正方形。</br>- `Triangle`: 三角形。</br>- `EmptyTriangle`: 空心三角形。</br>- `Diamond`: 菱形。</br>- `EmptyDiamond`: 空心菱形。</br>- `Arrow`: 箭头。</br>- `EmptyArrow`: 空心箭头。</br>|
-| `sizeType` | | 标记图形的大小获取方式。</br>`SymbolSizeType`:</br>- `Custom`: 自定义大小。</br>- `FromData`: 通过 dataIndex 从数据中获取，再乘以一个比例系数 dataScale 。</br>- `Function`: 通过委托函数获取。</br>|
 | `size` |0f | 标记的大小。 |
-| `selectedSize` |0f | 被选中的标记的大小。 |
-| `dataIndex` |1 | 当sizeType指定为FromData时，指定的数据源索引。 |
-| `dataScale` |1 | 当sizeType指定为FromData时，指定的倍数系数。 |
-| `selectedDataScale` |1.5f | 当sizeType指定为FromData时，指定的高亮倍数系数。 |
-| `sizeFunction` | | 当sizeType指定为Function时，指定的委托函数。 |
-| `selectedSizeFunction` | | 当sizeType指定为Function时，指定的高亮委托函数。 |
-| `startIndex` | | 开始显示图形标记的索引。 |
-| `interval` | | 显示图形标记的间隔。0表示显示所有标签，1表示隔一个隔显示一个标签，以此类推。 |
-| `forceShowLast` |false | 是否强制显示最后一个图形标记。 |
 | `gap` |0 | 图形标记和线条的间隙距离。 |
 | `width` |0f | 图形的宽。 |
 | `height` |0f | 图形的高。 |
-| `repeat` |false | 图形是否重复。 |
 | `offset` |Vector2.zero | 图形的偏移。 |
 | `image` | | 自定义的标记图形。 |
 | `imageType` | |  |
+| `color` | | 图形的颜色。 |
 
 ## `TextLimit`
 
@@ -1301,6 +1398,7 @@ Inherits or Implemented: [MainComponent](#MainComponent)
 | `alwayShowContent` |false | 是否触发后一直显示提示框浮层。 |
 | `offset` |Vector2(18f, -25f) | 提示框相对于鼠标位置的偏移。 |
 | `backgroundImage` | | 提示框的背景图片。 |
+| `backgroundType` | | 提示框的背景图片显示类型。 |
 | `backgroundColor` | | 提示框的背景颜色。 |
 | `borderWidth` |2f | 边框线宽。 |
 | `fixedXEnable` |false |  |
@@ -1360,11 +1458,10 @@ Inherits or Implemented: [MainComponent](#MainComponent)
 | `location` | | 组件显示的位置。 [Location](Location)|
 | `workOnLine` |true | 组件是否对LineChart的LineStyle有效。 |
 | `workOnArea` |false | 组件是否对LineChart的AreaStyle有效。 |
-| `inRange` | | 定义 在选中范围中 的视觉颜色。 |
 | `outOfRange` | | 定义 在选中范围外 的视觉颜色。 |
-| `pieces` | | 分段式每一段的相关配置。 |
+| `inRange` | | 分段式每一段的相关配置。 |
 
-## `VisualMapPieces`
+## `VisualMapRange`
 
 Inherits or Implemented: [ChildComponent](#ChildComponent)
 

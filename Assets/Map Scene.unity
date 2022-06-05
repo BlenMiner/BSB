@@ -2287,9 +2287,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2025567452}
-        m_TargetAssemblyTypeName: MapLayerManager, Assembly-CSharp
-        m_MethodName: OpenNewLayerWindow
+      - m_Target: {fileID: 985420635}
+        m_TargetAssemblyTypeName: GraphLayerManager, Assembly-CSharp
+        m_MethodName: AddNewLayer
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2792,7 +2792,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 631.974, y: 0}
+  m_AnchoredPosition: {x: 641.732, y: 0}
   m_SizeDelta: {x: 5, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &973132804
@@ -3074,7 +3074,6 @@ MonoBehaviour:
     type: 3}
   m_rawPrefabs:
   - Name: Temperature VS PM10
-    Formula: 69
 --- !u!1 &1046897605
 GameObject:
   m_ObjectHideFlags: 0
@@ -8550,6 +8549,8 @@ MonoBehaviour:
   m_windowDatabase:
   - {fileID: 3984835955728355467, guid: 869e31485f950c147be73d1f6c9d4bd6, type: 3}
   - {fileID: 8522158563958999302, guid: 341d3ccdb42a4c14db22549979deaa5a, type: 3}
+  - {fileID: 8522158563958999302, guid: 8c52ea89ea853ac4b954819beac7f16b, type: 3}
+  - {fileID: 580241408869962044, guid: a62e22179adbc17479a1c7056a8b42b3, type: 3}
   m_startLayerIndex: 10
 --- !u!1 &1862574002
 GameObject:

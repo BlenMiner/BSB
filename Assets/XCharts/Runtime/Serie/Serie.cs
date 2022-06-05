@@ -1,4 +1,3 @@
-﻿
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -12,7 +11,8 @@ namespace XCharts.Runtime
     public enum RoseType
     {
         /// <summary>
-        /// Don't show as Nightingale chart.不展示成南丁格尔玫瑰图
+        /// Don't show as Nightingale chart.
+        /// |不展示成南丁格尔玫瑰图。
         /// </summary>
         None,
         /// <summary>
@@ -35,12 +35,12 @@ namespace XCharts.Runtime
     {
         /// <summary>
         /// the normal line chart，
-        /// 普通折线图。
+        /// |普通折线图。
         /// </summary>
         Normal,
         /// <summary>
         /// the smooth line chart，
-        /// 平滑曲线。
+        /// |平滑曲线。
         /// </summary>
         Smooth,
         /// <summary>
@@ -60,35 +60,41 @@ namespace XCharts.Runtime
         StepEnd
     }
 
+    /// <summary>
+    /// the type of bar. |柱状图类型。
+    /// </summary>
     public enum BarType
     {
         /// <summary>
-        /// 普通柱形图
+        /// normal bar.
+        /// |普通柱形图。
         /// </summary>
         Normal,
         /// <summary>
-        /// 斑马柱形图
+        /// zebra bar.
+        /// |斑马柱形图。
         /// </summary>
         Zebra,
         /// <summary>
-        /// 胶囊柱形图
+        /// capsule bar.
+        /// |胶囊柱形图。
         /// </summary>
         Capsule
     }
 
-
-
     /// <summary>
-    /// 雷达图类型
+    /// the type of radar. |雷达图类型。
     /// </summary>
     public enum RadarType
     {
         /// <summary>
-        /// 多圈雷达图。此时可一个雷达里绘制多个圈，一个serieData就可组成一个圈（多维数据）。
+        /// multiple radar.
+        /// |多圈雷达图。此时可一个雷达里绘制多个圈，一个serieData就可组成一个圈（多维数据）。
         /// </summary>
         Multiple,
         /// <summary>
-        /// 单圈雷达图。此时一个雷达只能绘制一个圈，多个serieData组成一个圈，数据取自`data[1]`。
+        /// single radar.
+        /// |单圈雷达图。此时一个雷达只能绘制一个圈，多个serieData组成一个圈，数据取自`data[1]`。
         /// </summary>
         Single
     }
@@ -185,8 +191,8 @@ namespace XCharts.Runtime
         [SerializeField] private LineType m_LineType = LineType.Normal;
         [SerializeField] private BarType m_BarType = BarType.Normal;
         [SerializeField] private bool m_BarPercentStack = false;
-        [SerializeField] private float m_BarWidth = 0.6f;
-        [SerializeField] private float m_BarGap = 0.3f; // 30%
+        [SerializeField] private float m_BarWidth = 0;
+        [SerializeField] private float m_BarGap = 0.1f;
         [SerializeField] private float m_BarZebraWidth = 4f;
         [SerializeField] private float m_BarZebraGap = 2f;
 
@@ -204,9 +210,9 @@ namespace XCharts.Runtime
         [SerializeField] private RoseType m_RoseType = RoseType.None;
         [SerializeField] private float m_Gap;
         [SerializeField] private float[] m_Center = new float[2] { 0.5f, 0.48f };
-        [SerializeField] private float[] m_Radius = new float[2] { 0, 80 };
+        [SerializeField] private float[] m_Radius = new float[2] { 0, 0.28f };
 
-        [SerializeField] [Range(1, 10)] private int m_ShowDataDimension;
+        [SerializeField][Range(1, 10)] private int m_ShowDataDimension;
         [SerializeField] private bool m_ShowDataName;
         [SerializeField] private bool m_ShowDataIcon;
         [SerializeField] private bool m_Clip = false;
@@ -230,7 +236,7 @@ namespace XCharts.Runtime
         [SerializeField] private bool m_InsertDataToHead;
 
         [SerializeField] private LineStyle m_LineStyle = new LineStyle();
-        [SerializeField] private SymbolStyle m_Symbol = new SymbolStyle();
+        [SerializeField] private SerieSymbol m_Symbol = new SerieSymbol();
         [SerializeField] private AnimationStyle m_Animation = new AnimationStyle();
         [SerializeField] private ItemStyle m_ItemStyle = new ItemStyle();
         [SerializeField] private List<SerieData> m_Data = new List<SerieData>();
@@ -396,7 +402,7 @@ namespace XCharts.Runtime
         /// the symbol of serie data item.
         /// |标记的图形。
         /// </summary>
-        public SymbolStyle symbol
+        public SerieSymbol symbol
         {
             get { return m_Symbol; }
             set { if (PropertyUtil.SetClass(ref m_Symbol, value, true)) SetVerticesDirty(); }
@@ -826,7 +832,7 @@ namespace XCharts.Runtime
                     (areaStyle != null && areaStyle.vertsDirty) ||
                     (label != null && label.vertsDirty) ||
                     (labelLine != null && labelLine.vertsDirty) ||
-                    (emphasis != null && emphasis.vertsDirty) ||
+                    (emphasisItemStyle != null && emphasisItemStyle.vertsDirty) ||
                     (titleStyle != null && titleStyle.vertsDirty) ||
                     AnySerieDataVerticesDirty();
             }
@@ -836,11 +842,13 @@ namespace XCharts.Runtime
         {
             get
             {
-                return m_ComponentDirty
-                    || symbol.componentDirty
-                    || (titleStyle != null && titleStyle.componentDirty)
-                    || (label != null && label.componentDirty)
-                    || (labelLine != null && labelLine.componentDirty);
+                return m_ComponentDirty ||
+                    symbol.componentDirty ||
+                    (titleStyle != null && titleStyle.componentDirty) ||
+                    (label != null && label.componentDirty) ||
+                    (labelLine != null && labelLine.componentDirty) ||
+                    (emphasisLabel != null && emphasisLabel.componentDirty) ||
+                    (emphasisLabelLine != null && emphasisLabelLine.componentDirty);
             }
         }
         public override void ClearVerticesDirty()
@@ -855,8 +863,8 @@ namespace XCharts.Runtime
                 areaStyle.ClearVerticesDirty();
             if (label != null)
                 label.ClearVerticesDirty();
-            if (emphasis != null)
-                emphasis.ClearVerticesDirty();
+            if (emphasisItemStyle != null)
+                emphasisItemStyle.ClearVerticesDirty();
             if (lineArrow != null)
                 lineArrow.ClearVerticesDirty();
             if (titleStyle != null)
@@ -875,8 +883,10 @@ namespace XCharts.Runtime
                 areaStyle.ClearComponentDirty();
             if (label != null)
                 label.ClearComponentDirty();
-            if (emphasis != null)
-                emphasis.ClearComponentDirty();
+            if (emphasisLabel != null)
+                emphasisLabel.ClearComponentDirty();
+            if (emphasisLabelLine != null)
+                emphasisLabelLine.ClearComponentDirty();
             if (lineArrow != null)
                 lineArrow.ClearComponentDirty();
             if (titleStyle != null)
@@ -1061,6 +1071,7 @@ namespace XCharts.Runtime
 
         public void ResetInteract()
         {
+            interact.Reset();
             foreach (var serieData in m_Data)
                 serieData.interact.Reset();
         }
@@ -1431,7 +1442,7 @@ namespace XCharts.Runtime
             }
         }
 
-        public virtual double GetDataTotal(int dimension)
+        public virtual double GetDataTotal(int dimension, SerieData serieData = null)
         {
             if (m_Max > 0) return m_Max;
 
@@ -1451,8 +1462,8 @@ namespace XCharts.Runtime
         /// <returns></returns>
         public List<SerieData> GetDataList(DataZoom dataZoom = null)
         {
-            if (dataZoom != null && dataZoom.enable
-                && (dataZoom.IsContainsXAxis(xAxisIndex) || dataZoom.IsContainsYAxis(yAxisIndex)))
+            if (dataZoom != null && dataZoom.enable &&
+                (dataZoom.IsContainsXAxis(xAxisIndex) || dataZoom.IsContainsYAxis(yAxisIndex)))
             {
                 SerieHelper.UpdateFilterData(this, dataZoom);
                 return m_FilterData;
@@ -1570,10 +1581,18 @@ namespace XCharts.Runtime
                 serieData.context.highlight = flag;
         }
 
-        public float GetBarWidth(float categoryWidth)
+        public float GetBarWidth(float categoryWidth, int barCount = 0)
         {
-            if (m_BarWidth > 1) return m_BarWidth;
-            else return m_BarWidth * categoryWidth;
+            if (m_BarWidth == 0)
+            {
+                var width = ChartHelper.GetActualValue(0.6f, categoryWidth);
+                if (barCount == 0)
+                    return width < 1 ? categoryWidth : width;
+                else
+                    return width / barCount;
+            }
+            else
+                return ChartHelper.GetActualValue(m_BarWidth, categoryWidth);
         }
 
         public bool IsIgnoreIndex(int index, int dimension = 1)
@@ -1586,8 +1605,7 @@ namespace XCharts.Runtime
 
         public bool IsIgnoreValue(SerieData serieData, int dimension = 1)
         {
-            if (serieData.ignore) return true;
-            return IsIgnoreValue(serieData.GetData(dimension));
+            return serieData.ignore || IsIgnoreValue(serieData.GetData(dimension));
         }
 
         public bool IsIgnoreValue(double value)
