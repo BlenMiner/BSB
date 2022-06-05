@@ -3055,7 +3055,7 @@ MonoBehaviour:
   m_animationDuration: 0.2
   m_animationEase: 4
   m_positionOpen: {x: 0, y: 0}
-  m_positionClosed: {x: 500, y: 0}
+  m_positionClosed: {x: 503, y: 0}
 --- !u!114 &985420635
 MonoBehaviour:
   m_ObjectHideFlags: 0
