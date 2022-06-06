@@ -26,6 +26,7 @@ namespace WindinatorTools
                 m_instances.Add(GameObject.Instantiate(m_gameobject, m_parent, false));
 
             var go = m_instances[m_index++];
+            go.transform.SetAsLastSibling();
 
             if (!go.activeSelf) go.SetActive(true);
 

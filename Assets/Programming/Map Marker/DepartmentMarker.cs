@@ -56,7 +56,7 @@ public class DepartmentMarker : MonoBehaviour
             m_shape.rectTransform.sizeDelta = new Vector2(10, 10);
         }
 
-        if (m_weather.GetWeather(m_depId, percentage100, out var weather))
+        if (m_weather.GetWeather(0, percentage100, out var weather))
         {
             float t = weather.TemperatureMax24h;
 

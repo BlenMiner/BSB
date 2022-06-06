@@ -31,7 +31,8 @@ public class LineChartScript : MonoBehaviour
 
         for (int i = 0; i < label.Length; ++i)
         {
-            chart.AddSerie<Line>(label[i]);
+            var line = chart.AddSerie<Line>(label[i]);
+            line.symbol.show = false;
 
             int dataLen = data[i].Length;
 

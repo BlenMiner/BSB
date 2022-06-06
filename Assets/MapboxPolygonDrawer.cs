@@ -4,6 +4,7 @@ using Mapbox.Unity.Map;
 using Mapbox.Unity.MeshGeneration.Filters;
 using Mapbox.Unity.MeshGeneration.Modifiers;
 using UnityEngine;
+using UnityFx.Outline;
 
 public class MapboxPolygonDrawer : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class MapboxPolygonDrawer : MonoBehaviour
     [Inject] INSEEDataset m_inseeDataset;
 
     [Inject] BSB_Dataset m_polution;
+
+    [Inject] OutlineLayerCollection m_outline;
 
     static MapboxPolygonDrawer m_ref;
 
@@ -34,6 +37,8 @@ public class MapboxPolygonDrawer : MonoBehaviour
         static Dictionary<int, Dictionary<int, HashSet<MeshRenderer>>> m_attributesListeners 
         = new Dictionary<int, Dictionary<int, HashSet<MeshRenderer>>>();
 
+    static Dictionary<MeshRenderer, int> RendererToINSEE = new Dictionary<MeshRenderer, int>();
+
     public static bool GetMaterialProperties(int id, int insee, out MaterialPropertyBlock value)
     {
         value = null;
@@ -41,8 +46,19 @@ public class MapboxPolygonDrawer : MonoBehaviour
         return m_attributes.TryGetValue(id, out var local) && local.TryGetValue(insee, out value);
     }
 
+    public static bool GetINSEE(MeshRenderer renderer, out int insee)
+    {
+        return RendererToINSEE.TryGetValue(renderer, out insee);
+    }
+
     public static void SetMaterialPropertiesListener(int id, int insee, MeshRenderer renderer)
     {
+        if (ISEEMapSelector.SelectedISEE == insee)
+            m_ref.m_outline.GetOrAddLayer(0).Add(renderer.gameObject);
+
+        if (RendererToINSEE.ContainsKey(renderer)) RendererToINSEE[renderer] = insee;
+        else RendererToINSEE.Add(renderer, insee);
+
         if (!m_attributesListeners.ContainsKey(id)) m_attributesListeners.Add(id, new Dictionary<int, HashSet<MeshRenderer>>());
 
         var local = m_attributesListeners[id];
@@ -70,7 +86,10 @@ public class MapboxPolygonDrawer : MonoBehaviour
 
     public static void RemoveMaterialPropertiesListener(MeshRenderer listener)
     {
-        foreach(var a in m_attributesListeners)
+        m_ref.m_outline.GetOrAddLayer(0).Remove(listener.gameObject);
+
+        RendererToINSEE.Remove(listener);
+        foreach (var a in m_attributesListeners)
         {
             foreach(var l in a.Value)
             {
@@ -134,7 +153,11 @@ public class MapboxPolygonDrawer : MonoBehaviour
             },
             materialOptions = geoMaterials,
             colliderOptions = new ColliderOptions() {
-                colliderType = ColliderType.None
+                colliderType = ColliderType.MeshCollider
+            },
+            lineGeometryOptions =  new LineGeometryOptions()
+            {
+                CapType = JoinType.Bevel
             }
         };
 

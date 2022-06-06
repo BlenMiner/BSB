@@ -31,6 +31,11 @@ public class GraphLayerManager : MonoBehaviour
 
     private void OnEnable()
     {
+        ISEEMapSelector.SelectedISEEChanged += () =>
+        {
+            m_dirty = true;
+        };
+
         m_timeMachine.OnTimeMachineUpdate += TimeDirty;
         TimeDirty(0f, 0f);
     }
@@ -44,6 +49,8 @@ public class GraphLayerManager : MonoBehaviour
     {
         m_timeA = m_timeMachine.GetTime(aTime);
         m_timeB = m_timeMachine.GetTime(bTime);
+
+        m_dirty = true;
     }
 
     private void Start()
@@ -96,7 +103,12 @@ public class GraphLayerManager : MonoBehaviour
     {
         try
         {
-            string save = Newtonsoft.Json.JsonConvert.SerializeObject(m_layers.ToArray());
+            List<GraphLayerRaw> m_rawLayers = new List<GraphLayerRaw>();
+
+            foreach (var l in m_layers)
+                m_rawLayers.Add(l.ToRawLayer().ToRawRaw());
+
+            string save = Newtonsoft.Json.JsonConvert.SerializeObject(m_rawLayers.ToArray());
             PlayerPrefs.SetString("SAVE_GRAPH", save);
             PlayerPrefs.Save();
         }
@@ -111,13 +123,9 @@ public class GraphLayerManager : MonoBehaviour
 
     public void AddNewLayer()
     {
-        WindowManager.LastInstance.Push<CreateGraphWindow>().Setup(name =>
+        WindowManager.LastInstance.Push<GraphEditorWindow>().Setup(null, graph =>
         {
-            AddLayer(new GraphLayer
-            {
-                Name = name,
-                Formulas = new List<NamedFormula>()
-            });
+            AddLayer(graph);
         });
     }
 
@@ -129,18 +137,36 @@ public class GraphLayerManager : MonoBehaviour
 
     void LayersUpdated()
     {
+        int id = 0;
         foreach (var layer in m_layers)
         {
-            var chart = m_pool.GetInstance<LineChartScript>();
+            var entry = m_pool.GetInstance<GraphLayerEntry>();
 
-            chart.UpdateTitle(layer.Name);
-            chart.UpdateGraph(new DateTime(2017, 1, 1), new DateTime(2017, 12, 31),
-                m_timeA, m_timeB, layer.CalculateData(), layer.GetLabels());
+            entry.Setup(this, id++);
+
+            entry.Chart.UpdateTitle($"{layer.Name} - 2017");
+            entry.Chart.UpdateGraph(new DateTime(2017, 1, 1), new DateTime(2017, 12, 31),
+                m_timeA, m_timeB, layer.CalculateData(m_timeMachine), layer.GetLabels());
         }
 
         m_pool.DiscardRest();
 
         SaveLayers();
+    }
+
+    public void RemoveAt(int index)
+    {
+        m_layers.RemoveAt(index);
+        m_dirty = true;
+    }
+
+    public void Edit(int index)
+    {
+        WindowManager.LastInstance.Push<GraphEditorWindow>().Setup(m_layers[index], graph =>
+        {
+            m_layers[index] = graph;
+            m_dirty = true;
+        });
     }
 
     private void Update()
@@ -179,6 +205,7 @@ public class GraphLayer
 
     public string[] GetLabels()
     {
+        if (ISEEMapSelector.SelectedISEE < 0) return Array.Empty<string>();
         string[] labels = new string[Formulas.Count];
 
         for (int i = 0; i < labels.Length; ++i)
@@ -187,16 +214,25 @@ public class GraphLayer
         return labels;
     }
 
-    public float[][] CalculateData()
+    public float[][] CalculateData(TimeMachine timeMachine)
     {
+        if (ISEEMapSelector.SelectedISEE < 0) return Array.Empty<float[]>();
         float[][] data = new float[Formulas.Count][];
 
         for (int i = 0; i < data.Length; ++i)
         {
             data[i] = new float[365];
-            for (int j = 0; j < data[i].Length; ++j)
+
+            var f = Formulas[i].Formula;
+            int len = data[i].Length;
+
+            for (int j = 0; j < len; ++j)
             {
-                data[i][j] = Mathf.PerlinNoise(j * 0.5f, 0);
+                float p = (j / (float)(len - 1)) * 100f;
+                float time = timeMachine.GlobalToLocal(p);
+
+                f.Compute(ISEEMapSelector.SelectedISEE, time, out var v);
+                data[i][j] = v;
             }
         }
 
@@ -204,19 +240,21 @@ public class GraphLayer
     }
 }
 
-public struct NamedFormula
+[Serializable]
+public class NamedFormula
 {
     public string Name;
     public Formula Formula;
 }
 
+[Serializable]
 public struct RawNamedFormula
 {
     public string Name;
     public string Formula;
 }
 
-[System.Serializable]
+[Serializable]
 public class GraphLayerRaw
 {
     public string Name;

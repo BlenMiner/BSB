@@ -92,7 +92,7 @@ public class DepartmentDataset : Dataset
         return value;
     }
 
-    public void MapDepCoords(System.Action<string, Vector2d> cb)
+    public void MapDepCoords(Action<string, Vector2d> cb)
     {
         foreach(var v in m_departmentCoords)
             cb(v.Key, v.Value);

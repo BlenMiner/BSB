@@ -101,11 +101,17 @@ public class TimeMachine : MonoBehaviour, IDragHandler, IPointerDownHandler, IPo
         m_filter.options.Add(new TMP_Dropdown.OptionData("All"));
 
         int startYear = WeatherDataset.START_DATE.Year;
+        int select = 0;
 
         for (int i = 2022; i >= startYear; --i)
+        {
+            if (i < 2016) ++select;
             m_filter.options.Add(new TMP_Dropdown.OptionData(i.ToString()));
+        }
 
         m_filter.onValueChanged.AddListener(OnFilterChanged);
+        m_filter.value = select;
+
         OnFilterChanged(m_filter.value);
     }
 
@@ -146,6 +152,13 @@ public class TimeMachine : MonoBehaviour, IDragHandler, IPointerDownHandler, IPo
         var dateTime = WeatherDataset.START_DATE.AddDays(date);
 
         return dateTime;
+    }
+
+    public float GlobalToLocal(float percentage)
+    {
+        int len = m_subSpan.y - m_subSpan.x;
+        int date = m_subSpan.x + (int)(percentage * len / 100f);
+        return (date - m_startDate) / (float)(m_lengthDate * 0.01f);
     }
 
     public void SetSnapshot(float percentage)

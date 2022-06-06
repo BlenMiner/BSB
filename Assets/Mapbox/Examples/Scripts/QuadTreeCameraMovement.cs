@@ -6,8 +6,9 @@
 	using UnityEngine;
 	using UnityEngine.EventSystems;
 	using System;
+    using UnityFx.Outline;
 
-	public class QuadTreeCameraMovement : MonoBehaviour
+    public class QuadTreeCameraMovement : MonoBehaviour
 	{
 		[SerializeField]
 		[Range(1, 20)]
@@ -16,11 +17,14 @@
 		[SerializeField]
 		float _zoomSpeed = 0.25f;
 
-		[SerializeField]
+		[SerializeField, Provides]
 		public Camera _referenceCamera;
 
 		[SerializeField, Provides]
 		AbstractMap _mapManager;
+
+		[SerializeField, Provides]
+		OutlineLayerCollection m_outline;
 
 		[SerializeField]
 		bool _useDegreeMethod;

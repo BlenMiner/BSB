@@ -279,30 +279,23 @@ public class WeatherDataset : Dataset
         br.Close();
     }
 
-    public bool GetWeather(string departmentId, float timep100, out WeatherState value)
+    public bool GetWeather(int code, float timep100, out WeatherState value)
     {
         value = default;
-        bool addOffsets = false;
         
-        if (departmentId != "91")
-        {
-            Random.InitState(int.Parse(departmentId));
-            departmentId = "91";
-            addOffsets = true;
-        }
+        if (!m_timemachine.ContainsKey("91")) return false;
+        value = m_timemachine["91"].GetFrame(timep100);
 
-        if (!m_timemachine.ContainsKey(departmentId)) return false;
-        value = m_timemachine[departmentId].GetFrame(timep100);
+        INSEEDataset.me.GetINSEE(code, out var p);
 
-        if (addOffsets)
-        {
-            float timeOffset = Random.Range(-2000, 20000f) + timep100;
-            value.TemperatureMin24h += (Mathf.PerlinNoise(timeOffset, 0) - 0.5f) * 2f * 5f;
-            value.TemperatureMax24h += (Mathf.PerlinNoise(0, timeOffset + 200) - 0.5f) * 2f * 5f;
+        float timeOffsetX = (float)p.LonLat.x * 1 + timep100 * 5;
+        float timeOffsetY = (float)p.LonLat.y * 1 + timep100 * 5;
 
-            value.HumidityMax24h += (Mathf.PerlinNoise(timeOffset + 500, 0) - 0.5f) * 2f * 5f;
-            value.HumidityMin24h += (Mathf.PerlinNoise(0, timeOffset - 800) - 0.5f) * 2f * 5f;
-        }
+        value.TemperatureMin24h += (Mathf.PerlinNoise(timeOffsetX, timeOffsetY - 1515) - 0.5f) * 5f;
+        value.TemperatureMax24h += (Mathf.PerlinNoise(timeOffsetX - 1515, timeOffsetY) - 0.5f) * 5f;
+
+        value.HumidityMax24h += (Mathf.PerlinNoise(timeOffsetX + 1515, timeOffsetY) - 0.5f) * 5f;
+        value.HumidityMin24h += (Mathf.PerlinNoise(timeOffsetX, timeOffsetY + 1515) - 0.5f) * 5f;
 
         return true;
     }
@@ -326,7 +319,7 @@ public class WeatherDataset : Dataset
     {
         value = 0f;
 
-        if (!GetWeather(GetDepartmentID(postalCode), time, out var weather)) return false;
+        if (!GetWeather(postalCode, time, out var weather)) return false;
 
         switch (property)
         {
